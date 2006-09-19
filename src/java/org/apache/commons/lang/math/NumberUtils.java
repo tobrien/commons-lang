@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -82,7 +83,7 @@ public class NumberUtils {
      * to operate.</p>
      */
     public NumberUtils() {
-      ; // empty constructor
+        super();
     }
 
     //-----------------------------------------------------------------------
@@ -473,7 +474,7 @@ public class NumberUtils {
                         }
 
                     } catch (NumberFormatException nfe) {
-                      ; // empty catch
+                        // ignore the bad number
                     }
                     //Fall through
                 case 'd' :
@@ -484,12 +485,12 @@ public class NumberUtils {
                             return d;
                         }
                     } catch (NumberFormatException nfe) {
-                      ; // empty constructor
+                        // ignore the bad number
                     }
                     try {
                         return createBigDecimal(numeric);
                     } catch (NumberFormatException e) {
-                      ; // empty constructor
+                        // ignore the bad number
                     }
                     //Fall through
                 default :
@@ -509,12 +510,12 @@ public class NumberUtils {
                 try {
                     return createInteger(str);
                 } catch (NumberFormatException nfe) {
-                  ; // empty contructor
+                    // ignore the bad number
                 }
                 try {
                     return createLong(str);
                 } catch (NumberFormatException nfe) {
-                  ; // empty constructor
+                    // ignore the bad number
                 }
                 return createBigInteger(str);
 
@@ -527,7 +528,7 @@ public class NumberUtils {
                         return f;
                     }
                 } catch (NumberFormatException nfe) {
-                  ; // empty constructor
+                    // ignore the bad number
                 }
                 try {
                     Double d = createDouble(str);
@@ -535,7 +536,7 @@ public class NumberUtils {
                         return d;
                     }
                 } catch (NumberFormatException nfe) {
-                  ; // empty constructor
+                    // ignore the bad number
                 }
 
                 return createBigDecimal(str);

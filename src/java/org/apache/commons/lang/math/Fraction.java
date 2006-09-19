@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -35,7 +36,11 @@ import java.math.BigInteger;
  */
 public final class Fraction extends Number implements Serializable, Comparable {
 
-    /** Serialization lock, Lang version 2.0 */
+    /**
+     * Required for serialization support. Lang version 2.0.
+     * 
+     * @see java.io.Serializable
+     */
     private static final long serialVersionUID = 65382027393090L;
 
     /**
@@ -189,8 +194,11 @@ public final class Fraction extends Number implements Serializable, Comparable {
     }
 
     /**
-     * <p>Creates a <code>Fraction</code> instance with the 2 parts
+     * <p>Creates a reduced <code>Fraction</code> instance with the 2 parts
      * of a fraction Y/Z.</p>
+     *
+     * <p>For example, if the input parameters represent 2/4, then the created
+     * fraction will be 1/2.</p>
      *
      * <p>Any negative signs are resolved to be on the numerator.</p>
      *
@@ -448,12 +456,18 @@ public final class Fraction extends Number implements Serializable, Comparable {
 
     /**
      * <p>Reduce the fraction to the smallest values for the numerator and
-     * denominator, returning the result..</p>
+     * denominator, returning the result.</p>
+     * 
+     * <p>For example, if this fraction represents 2/4, then the result
+     * will be 1/2.</p>
      *
-     * @return a new reduce fraction instance, or this if no simplification possible
+     * @return a new reduced fraction instance, or this if no simplification possible
      */
     public Fraction reduce() {
         int gcd = greatestCommonDivisor(Math.abs(numerator), denominator);
+        if (gcd == 1) {
+            return this;
+        }
         return Fraction.getFraction(numerator / gcd, denominator / gcd);
     }
 
@@ -838,6 +852,10 @@ public final class Fraction extends Number implements Serializable, Comparable {
     /**
      * <p>Compares this object to another based on size.</p>
      *
+     * <p>Note: this class has a natural ordering that is inconsistent
+     * with equals, because, for example, equals treats 1/2 and 2/4 as
+     * different, whereas compareTo treats them as equal.
+     *
      * @param object  the object to compare to
      * @return -1 if this is less, 0 if equal, +1 if greater
      * @throws ClassCastException if the object is not a <code>Fraction</code>
@@ -896,6 +914,8 @@ public final class Fraction extends Number implements Serializable, Comparable {
                 toProperString = "0";
             } else if (numerator == denominator) {
                 toProperString = "1";
+            } else if (numerator == -1 * denominator) {
+                toProperString = "-1";
             } else if ((numerator>0?-numerator:numerator) < -denominator) {
                 // note that we do the magnitude comparison test above with
                 // NEGATIVE (not positive) numbers, since negative numbers

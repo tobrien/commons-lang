@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -1811,6 +1812,8 @@ public class ArrayUtilsTest extends TestCase {
         assertEquals(-1, ArrayUtils.lastIndexOf(array, (double) 0, 2, (double) 0));
         array = new double[0];
         assertEquals(-1, ArrayUtils.lastIndexOf(array, (double) 0, 2, (double) 0));
+        array = new double[] { (double) 3 };
+        assertEquals(-1, ArrayUtils.lastIndexOf(array, (double) 1, 0, (double) 0));
         array = new double[] { 0, 1, 2, 3, 0 };
         assertEquals(4, ArrayUtils.lastIndexOf(array, (double) 0, 99, (double) 0.3));
         assertEquals(0, ArrayUtils.lastIndexOf(array, (double) 0, 3, (double) 0.3));
@@ -2019,6 +2022,62 @@ public class ArrayUtilsTest extends TestCase {
         );
     }
 
+    // testToPrimitive/Object for byte
+    //  -----------------------------------------------------------------------
+    public void testToPrimitive_char() {
+        final Character[] b = null;
+        assertEquals(null, ArrayUtils.toPrimitive(b));
+        
+        assertSame(ArrayUtils.EMPTY_CHAR_ARRAY, ArrayUtils.toPrimitive(new Character[0]));
+        
+        assertTrue(Arrays.equals(
+            new char[] {Character.MIN_VALUE, Character.MAX_VALUE, '0'},
+            ArrayUtils.toPrimitive(new Character[] {new Character(Character.MIN_VALUE), 
+                new Character(Character.MAX_VALUE), new Character('0')}))
+        );
+
+        try {
+            ArrayUtils.toPrimitive(new Character[] {new Character(Character.MIN_VALUE), null});
+            fail();
+        } catch (NullPointerException ex) {}
+    }
+
+    public void testToPrimitive_char_char() {
+        final Character[] b = null;
+        assertEquals(null, ArrayUtils.toPrimitive(b, Character.MIN_VALUE));
+        
+        assertSame(ArrayUtils.EMPTY_CHAR_ARRAY, 
+            ArrayUtils.toPrimitive(new Character[0], (char)0));
+        
+        assertTrue(Arrays.equals(
+            new char[] {Character.MIN_VALUE, Character.MAX_VALUE, '0'},
+            ArrayUtils.toPrimitive(new Character[] {new Character(Character.MIN_VALUE), 
+                new Character(Character.MAX_VALUE), new Character('0')}, 
+                Character.MIN_VALUE))
+        );
+        
+        assertTrue(Arrays.equals(
+            new char[] {Character.MIN_VALUE, Character.MAX_VALUE, '0'},
+            ArrayUtils.toPrimitive(new Character[] {new Character(Character.MIN_VALUE), null, 
+                new Character('0')}, Character.MAX_VALUE))
+        );
+    }
+
+    public void testToObject_char() {
+        final char[] b = null;
+        assertEquals(null, ArrayUtils.toObject(b));
+        
+        assertSame(ArrayUtils.EMPTY_CHARACTER_OBJECT_ARRAY, 
+            ArrayUtils.toObject(new char[0]));
+        
+        assertTrue(Arrays.equals(
+            new Character[] {new Character(Character.MIN_VALUE), 
+                new Character(Character.MAX_VALUE), new Character('0')},
+                ArrayUtils.toObject(new char[] {Character.MIN_VALUE, Character.MAX_VALUE, 
+                '0'} ))
+        );
+    }
+    
     // testToPrimitive/Object for byte
     //  -----------------------------------------------------------------------
     public void testToPrimitive_byte() {

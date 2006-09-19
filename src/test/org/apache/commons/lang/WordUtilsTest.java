@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -248,7 +249,103 @@ public class WordUtilsTest extends TestCase {
         assertEquals("i AM.fINE", WordUtils.uncapitalize("I AM.FINE", chars) );
         assertEquals("i aM.FINE", WordUtils.uncapitalize("I AM.FINE", null) );
     }
-    
+
+    //-----------------------------------------------------------------------
+    public void testInitials_String() {
+        assertEquals(null, WordUtils.initials(null));
+        assertEquals("", WordUtils.initials(""));
+        assertEquals("", WordUtils.initials("  "));
+
+        assertEquals("I", WordUtils.initials("I"));
+        assertEquals("i", WordUtils.initials("i"));
+        assertEquals("BJL", WordUtils.initials("Ben John Lee"));
+        assertEquals("BJ", WordUtils.initials("Ben J.Lee"));
+        assertEquals("BJ.L", WordUtils.initials(" Ben   John  . Lee"));
+        assertEquals("iah1", WordUtils.initials("i am here 123"));
+    }
+
+    // -----------------------------------------------------------------------
+    public void testInitials_String_charArray() {
+        char[] array = null;
+        assertEquals(null, WordUtils.initials(null, array));
+        assertEquals("", WordUtils.initials("", array));
+        assertEquals("", WordUtils.initials("  ", array));
+        assertEquals("I", WordUtils.initials("I", array));
+        assertEquals("i", WordUtils.initials("i", array));
+        assertEquals("S", WordUtils.initials("SJC", array));
+        assertEquals("BJL", WordUtils.initials("Ben John Lee", array));
+        assertEquals("BJ", WordUtils.initials("Ben J.Lee", array));
+        assertEquals("BJ.L", WordUtils.initials(" Ben   John  . Lee", array));
+        assertEquals("KO", WordUtils.initials("Kay O'Murphy", array));
+        assertEquals("iah1", WordUtils.initials("i am here 123", array));
+        
+        array = new char[0];
+        assertEquals(null, WordUtils.initials(null, array));
+        assertEquals("", WordUtils.initials("", array));
+        assertEquals("", WordUtils.initials("  ", array));
+        assertEquals("", WordUtils.initials("I", array));
+        assertEquals("", WordUtils.initials("i", array));
+        assertEquals("", WordUtils.initials("SJC", array));
+        assertEquals("", WordUtils.initials("Ben John Lee", array));
+        assertEquals("", WordUtils.initials("Ben J.Lee", array));
+        assertEquals("", WordUtils.initials(" Ben   John  . Lee", array));
+        assertEquals("", WordUtils.initials("Kay O'Murphy", array));
+        assertEquals("", WordUtils.initials("i am here 123", array));
+        
+        array = " ".toCharArray();
+        assertEquals(null, WordUtils.initials(null, array));
+        assertEquals("", WordUtils.initials("", array));
+        assertEquals("", WordUtils.initials("  ", array));
+        assertEquals("I", WordUtils.initials("I", array));
+        assertEquals("i", WordUtils.initials("i", array));
+        assertEquals("S", WordUtils.initials("SJC", array));
+        assertEquals("BJL", WordUtils.initials("Ben John Lee", array));
+        assertEquals("BJ", WordUtils.initials("Ben J.Lee", array));
+        assertEquals("BJ.L", WordUtils.initials(" Ben   John  . Lee", array));
+        assertEquals("KO", WordUtils.initials("Kay O'Murphy", array));
+        assertEquals("iah1", WordUtils.initials("i am here 123", array));
+        
+        array = " .".toCharArray();
+        assertEquals(null, WordUtils.initials(null, array));
+        assertEquals("", WordUtils.initials("", array));
+        assertEquals("", WordUtils.initials("  ", array));
+        assertEquals("I", WordUtils.initials("I", array));
+        assertEquals("i", WordUtils.initials("i", array));
+        assertEquals("S", WordUtils.initials("SJC", array));
+        assertEquals("BJL", WordUtils.initials("Ben John Lee", array));
+        assertEquals("BJL", WordUtils.initials("Ben J.Lee", array));
+        assertEquals("BJL", WordUtils.initials(" Ben   John  . Lee", array));
+        assertEquals("KO", WordUtils.initials("Kay O'Murphy", array));
+        assertEquals("iah1", WordUtils.initials("i am here 123", array));
+        
+        array = " .'".toCharArray();
+        assertEquals(null, WordUtils.initials(null, array));
+        assertEquals("", WordUtils.initials("", array));
+        assertEquals("", WordUtils.initials("  ", array));
+        assertEquals("I", WordUtils.initials("I", array));
+        assertEquals("i", WordUtils.initials("i", array));
+        assertEquals("S", WordUtils.initials("SJC", array));
+        assertEquals("BJL", WordUtils.initials("Ben John Lee", array));
+        assertEquals("BJL", WordUtils.initials("Ben J.Lee", array));
+        assertEquals("BJL", WordUtils.initials(" Ben   John  . Lee", array));
+        assertEquals("KOM", WordUtils.initials("Kay O'Murphy", array));
+        assertEquals("iah1", WordUtils.initials("i am here 123", array));
+        
+        array = "SIJo1".toCharArray();
+        assertEquals(null, WordUtils.initials(null, array));
+        assertEquals("", WordUtils.initials("", array));
+        assertEquals(" ", WordUtils.initials("  ", array));
+        assertEquals("", WordUtils.initials("I", array));
+        assertEquals("i", WordUtils.initials("i", array));
+        assertEquals("C", WordUtils.initials("SJC", array));
+        assertEquals("Bh", WordUtils.initials("Ben John Lee", array));
+        assertEquals("B.", WordUtils.initials("Ben J.Lee", array));
+        assertEquals(" h", WordUtils.initials(" Ben   John  . Lee", array));
+        assertEquals("K", WordUtils.initials("Kay O'Murphy", array));
+        assertEquals("i2", WordUtils.initials("i am here 123", array));
+    }
+
+    // -----------------------------------------------------------------------
     public void testSwapCase_String() {
         assertEquals(null, WordUtils.swapCase(null));
         assertEquals("", WordUtils.swapCase(""));
@@ -260,6 +357,10 @@ public class WordUtilsTest extends TestCase {
         assertEquals("i aM hERE 123", WordUtils.swapCase("I Am Here 123") );
         assertEquals("I AM here 123", WordUtils.swapCase("i am HERE 123") );
         assertEquals("i am here 123", WordUtils.swapCase("I AM HERE 123") );
+
+        String test = "This String contains a TitleCase character: \u01C8";
+        String expect = "tHIS sTRING CONTAINS A tITLEcASE CHARACTER: \u01C9";
+        assertEquals(expect, WordUtils.swapCase(test));
     }
 
 }

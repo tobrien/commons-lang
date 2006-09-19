@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -67,7 +68,7 @@ public class DurationFormatUtils {
 
     //-----------------------------------------------------------------------
     /**
-     * <p>Get the time gap as a string.</p>
+     * <p>Formats the time gap as a string.</p>
      * 
      * <p>The format used is ISO8601-like:
      * <i>H</i>:<i>m</i>:<i>s</i>.<i>S</i>.</p>
@@ -80,12 +81,12 @@ public class DurationFormatUtils {
     }
 
     /**
-     * <p>Get the time gap as a string.</p>
+     * <p>Formats the time gap as a string.</p>
      * 
      * <p>The format used is the ISO8601 period format.</p>
      * 
      * <p>This method formats durations using the days and lower fields of the
-     * ISO format pattern, such as P7D6H5M4.321S.</p>
+     * ISO format pattern, such as P7D6TH5M4.321S.</p>
      * 
      * @param durationMillis  the duration to format
      * @return the time as a String
@@ -95,7 +96,7 @@ public class DurationFormatUtils {
     }
 
     /**
-     * <p>Get the time gap as a string, using the specified format, and padding with zeros and 
+     * <p>Formats the time gap as a string, using the specified format, and padding with zeros and 
      * using the default timezone.</p>
      * 
      * <p>This method formats durations using the days and lower fields of the
@@ -110,7 +111,7 @@ public class DurationFormatUtils {
     }
 
     /**
-     * <p>Get the time gap as a string, using the specified format.
+     * <p>Formats the time gap as a string, using the specified format.
      * Padding the left hand side of numbers with zeroes is optional and 
      * the timezone may be specified.</p>
      * 
@@ -156,7 +157,7 @@ public class DurationFormatUtils {
     }
 
     /**
-     * <p>Format an elapsed time into a plurialization correct string.</p>
+     * <p>Formats an elapsed time into a plurialization correct string.</p>
      * 
      * <p>This method formats durations using the days and lower fields of the
      * format pattern. Months and larger are not used.</p>
@@ -211,16 +212,17 @@ public class DurationFormatUtils {
             }
         }
         // handle plurals
-        duration = StringUtils.replaceOnce(duration, "1 seconds", "1 second");
-        duration = StringUtils.replaceOnce(duration, "1 minutes", "1 minute");
-        duration = StringUtils.replaceOnce(duration, "1 hours", "1 hour");
-        duration = StringUtils.replaceOnce(duration, "1 days", "1 day");
-        return duration;
+        duration = " " + duration;
+        duration = StringUtils.replaceOnce(duration, " 1 seconds", " 1 second");
+        duration = StringUtils.replaceOnce(duration, " 1 minutes", " 1 minute");
+        duration = StringUtils.replaceOnce(duration, " 1 hours", " 1 hour");
+        duration = StringUtils.replaceOnce(duration, " 1 days", " 1 day");
+        return duration.trim();
     }
 
     //-----------------------------------------------------------------------
     /**
-     * <p>Get the time gap as a string.</p>
+     * <p>Formats the time gap as a string.</p>
      * 
      * <p>The format used is the ISO8601 period format.</p>
      * 
@@ -233,7 +235,7 @@ public class DurationFormatUtils {
     }
 
     /**
-     * <p>Get the time gap as a string, using the specified format.
+     * <p>Formats the time gap as a string, using the specified format.
      * Padding the left hand side of numbers with zeroes is optional.
      * 
      * @param startMillis  the start of the duration
@@ -246,7 +248,7 @@ public class DurationFormatUtils {
     }
 
     /**
-     * <p>Get the time gap as a string, using the specified format.
+     * <p>Formats the time gap as a string, using the specified format.
      * Padding the left hand side of numbers with zeroes is optional and 
      * the timezone may be specified. 
      * 
@@ -275,37 +277,38 @@ public class DurationFormatUtils {
         end.setTime(new Date(endMillis));
 
         // initial estimates
-        int years = end.get(Calendar.YEAR) - start.get(Calendar.YEAR);
-        int months = end.get(Calendar.MONTH) - start.get(Calendar.MONTH);
-        // each initial estimate is adjusted in case it is under 0
-        while (months < 0) {
-            months += 12;
-            years -= 1;
-        }
-        int days = end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH);
-        while (days < 0) {
-            days += 31; // such overshooting is taken care of later on
-            months -= 1;
-        }
-        int hours = end.get(Calendar.HOUR_OF_DAY) - start.get(Calendar.HOUR_OF_DAY);
-        while (hours < 0) {
-            hours += 24;
-            days -= 1;
-        }
-        int minutes = end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE);
-        while (minutes < 0) {
-            minutes += 60;
-            hours -= 1;
-        }
+        int milliseconds = end.get(Calendar.MILLISECOND) - start.get(Calendar.MILLISECOND);
         int seconds = end.get(Calendar.SECOND) - start.get(Calendar.SECOND);
+        int minutes = end.get(Calendar.MINUTE) - start.get(Calendar.MINUTE);
+        int hours = end.get(Calendar.HOUR_OF_DAY) - start.get(Calendar.HOUR_OF_DAY);
+        int days = end.get(Calendar.DAY_OF_MONTH) - start.get(Calendar.DAY_OF_MONTH);
+        int months = end.get(Calendar.MONTH) - start.get(Calendar.MONTH);
+        int years = end.get(Calendar.YEAR) - start.get(Calendar.YEAR);
+
+        // each initial estimate is adjusted in case it is under 0
+        while (milliseconds < 0) {
+            milliseconds += 1000;
+            seconds -= 1;
+        }
         while (seconds < 0) {
             seconds += 60;
             minutes -= 1;
         }
-        int milliseconds = end.get(Calendar.MILLISECOND) - start.get(Calendar.MILLISECOND);
-        while (milliseconds < 0) {
-            milliseconds += 1000;
-            seconds -= 1;
+        while (minutes < 0) {
+            minutes += 60;
+            hours -= 1;
+        }
+        while (hours < 0) {
+            hours += 24;
+            days -= 1;
+        }
+        while (days < 0) {
+            days += 31; // such overshooting is taken care of later on
+            months -= 1;
+        }
+        while (months < 0) {
+            months += 12;
+            years -= 1;
         }
 
         // take estimates off of end to see if we can equal start, when it overshoots recalculate
@@ -456,7 +459,7 @@ public class DurationFormatUtils {
     static final Object S = "S";
     
     /**
-     * Parse a classic date format string into Tokens
+     * Parses a classic date format string into Tokens
      *
      * @param format to parse
      * @return Token[] of tokens
@@ -543,7 +546,7 @@ public class DurationFormatUtils {
         private int count;
 
         /**
-         * Wrap a token around a value. A value would be something like a 'Y'.
+         * Wraps a token around a value. A value would be something like a 'Y'.
          *
          * @param value to wrap
          */
@@ -553,7 +556,7 @@ public class DurationFormatUtils {
         }
 
         /**
-         * Wrap a token around a repeated number of a value, for example it would 
+         * Wraps a token around a repeated number of a value, for example it would 
          * store 'yyyy' as a value for y and a count of 4.
          *
          * @param value to wrap
@@ -565,14 +568,14 @@ public class DurationFormatUtils {
         }
 
         /**
-         * Add another one of the value
+         * Adds another one of the value
          */
         void increment() { 
             count++;
         }
 
         /**
-         * Get the current number of values represented
+         * Gets the current number of values represented
          *
          * @return int number of values represented
          */
@@ -581,7 +584,7 @@ public class DurationFormatUtils {
         }
 
         /**
-         * Get the particular value this token represents.
+         * Gets the particular value this token represents.
          * 
          * @return Object value
          */
@@ -617,7 +620,18 @@ public class DurationFormatUtils {
         }
 
         /**
-         * Represent this token as a String.
+         * Returns a hashcode for the token equal to the 
+         * hashcode for the token's value. Thus 'TT' and 'TTTT' 
+         * will have the same hashcode. 
+         *
+         * @return The hashcode for the token
+         */
+        public int hashCode() {
+            return this.value.hashCode();
+        }
+
+        /**
+         * Represents this token as a String.
          *
          * @return String representation of the token
          */

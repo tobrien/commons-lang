@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -25,10 +26,10 @@ import java.util.TreeMap;
  * <p>Provides HTML and XML entity utilities.</p>
  *
  * @see <a href="http://hotwired.lycos.com/webmonkey/reference/special_characters/">ISO Entities</a>
- * @see <br/><a href="http://www.w3.org/TR/REC-html32#latin1">HTML 3.2 Character Entities for ISO Latin-1</a>
- * @see <br/><a href="http://www.w3.org/TR/REC-html40/sgml/entities.html">HTML 4.0 Character entity references</a>
- * @see <br/><a href="http://www.w3.org/TR/html401/charset.html#h-5.3">HTML 4.01 Character References</a>
- * @see <br/><a href="http://www.w3.org/TR/html401/charset.html#code-position">HTML 4.01 Code positions</a>
+ * @see <a href="http://www.w3.org/TR/REC-html32#latin1">HTML 3.2 Character Entities for ISO Latin-1</a>
+ * @see <a href="http://www.w3.org/TR/REC-html40/sgml/entities.html">HTML 4.0 Character entity references</a>
+ * @see <a href="http://www.w3.org/TR/html401/charset.html#h-5.3">HTML 4.01 Character References</a>
+ * @see <a href="http://www.w3.org/TR/html401/charset.html#code-position">HTML 4.01 Code positions</a>
  *
  * @author <a href="mailto:alex@purpletech.com">Alexander Day Chaffee</a>
  * @author <a href="mailto:ggregory@seagullsw.com">Gary Gregory</a>
@@ -620,7 +621,7 @@ class Entities {
          * Constructs a new instance of <code>BinaryEntityMap</code>.
          */
         public BinaryEntityMap() {
-          ; // empty constructor
+          super();
         }
 
         /**
@@ -820,6 +821,12 @@ class Entities {
                     buf.append(ch);
                     continue;
                 }
+                int amph = str.indexOf('&', i + 1);
+                if( amph != -1 && amph < semi ) {
+                    // Then the text looks like &...&...;
+                    buf.append(ch);
+                    continue;
+                }
                 String entityName = str.substring(i + 1, semi);
                 int entityValue;
                 if (entityName.length() == 0) {
@@ -883,6 +890,12 @@ class Entities {
                     writer.write(c);
                     continue;
                 }
+                int amphersandIdx = string.indexOf('&', i + 1);
+                if( amphersandIdx != -1 && amphersandIdx < semiColonIdx ) {
+                    // Then the text looks like &...&...;
+                    writer.write(c);
+                    continue;
+                }
                 String entityContent = string.substring(nextIdx, semiColonIdx);
                 int entityValue = -1;
                 int entityContentLen = entityContent.length();
@@ -901,6 +914,7 @@ class Entities {
                                     }
                                 }
                             } catch (NumberFormatException e) {
+                                // ignore the escaped value content
                             }
                         }
                     } else { //escaped value content is an entity name

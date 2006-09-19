@@ -1,18 +1,21 @@
 $Id$
 
                         Commons Lang Package
-                            Version 2.1
+                            Version 2.2
                            Release Notes
 
 
 INTRODUCTION:
 
-This document contains the release notes for the 2.1 version of Apache Jakarta Commons Lang.
+This document contains the release notes for the 2.2 version of Apache Jakarta Commons Lang.
 Commons Lang is a set of utility functions and reusable components that
 should be of use in any Java environment.
 
+INCOMPATIBLE CHANGES WITH VERSION 2.1:
 
-INCOMPATIBLE CHANGES:
+- None
+
+ADDITIONAL INCOMPATIBLE CHANGES WITH VERSION 2.0:
 
 - The Nestable interface defines the method indexOfThrowable(Class).
 Previously the implementations checked only for a specific Class.
@@ -30,8 +33,11 @@ If your code previously relied on unusual aspects, it may no longer work.
 junit.jar to ANT_HOME/lib. You can get JUnit from http://www.junit.org. See the developer's guide
 for more details.
 
+DEPRECATIONS FROM 2.1 to 2.2:
 
-DEPRECATIONS:
+- None
+
+DEPRECATIONS FROM 2.0 to 2.1:
 
 - The enum package has been renamed to enums for JDK1.5 compilance.
 All functionality is identical, just the package has changed.
@@ -43,93 +49,64 @@ This package will be removed in v3.0.
 as int not long. The replacements are MILLIS_PER_*. 
 
 
-NEW FEATURES:
+BUG FIXES IN 2.2:
 
-New:
-- Mutable package - contains basic classes that hold an Object or primitive
-and provide both get and set methods.
-- DurationFormatUtils - provides various methods for formatting durations
-- CharEncoding - definitions of constants for character encoding work
-- CharUtils - utilities for working with characters
+LANG-2    javadoc example for StringUtils.splitByWholeSeparator incorrect
+LANG-3    PADDING array in StringUtils overflows on '\uffff'
+LANG-10   [patch] ClassUtils.primitiveToWrapper and Void
+LANG-21   escapeXML() -> Not escaping low characters
+LANG-25   DurationFormatUtils.formatDurationISO() javadoc is missing T in duration string between date and time part
+LANG-37   unit test for org.apache.commons.lang.text.StrBuilder
+LANG-42   EqualsBuilder.append(Object[], Object[]) crashes with a NullPointerException if an element of the first array is null
+LANG-45   StrBuilderTest#testReplaceStringString fails.
+LANG-50   Replace Clover with Cobertura
+LANG-59   DateUtils.truncate method is buggy when dealing with DST switching hours
+LANG-100  RandomStringUtils.random() family of methods create invalid unicode sequences
+LANG-105  ExceptionUtils goes into infinite loop in getThrowables is throwable.getCause() == throwable
+LANG-106  StringUtils#getLevenshteinDistance() performance is sub-optimal
+LANG-112  Wrong length check in StrTokenizer.StringMatcher
+LANG-117  FastDateFormat: wrong format for date "01.01.1000"
+LANG-122  EscapeUtil.escapeHtml() should clarify that it does not escape ' chars to &apos;
+LANG-123  Unclear javadoc for DateUtils.iterator()
+LANG-127  Minor tweak to fix of bug # 26616
+LANG-130  Memory "leak" in StringUtils
+LANG-140  DurationFormatUtils.formatPeriod() returns the wrong result
+LANG-141  Fraction.toProperString() returns -1/1 for -1
+LANG-148  Performance modifications on StringUtils.replace
+LANG-150  StringEscapeUtils.unescapeHtml skips first entity after standalone ampersand
+LANG-152  DurationFormatUtils.formatDurationWords "11 <unit>s" gets converted to "11 <unit>"
+LANG-259  ValuedEnum.compareTo(Object other) not typesafe - it easily could be...
+LANG-261  Error in an example in the javadoc of the StringUtils.splitPreserveAllTokens() method
+LANG-264  ToStringBuilder/HashCodeBuilder javadoc code examples
+LANG-271  LocaleUtils test fails under Mustang
+LANG-272  Minor build and checkstyle changes
+LANG-277  Javadoc errors on StringUtils.splitPreserveAllTokens(String, char)
+LANG-278  javadoc for StringUtils.removeEnd is incorrect
 
-Updated:
-- ArrayUtils - many more methods, especially List-like methods
-- BooleanUtils - isTrue and isFalse methods that handle null
-- ClassUtils - primitive to wrapper class conversion methods
-- ClassUtils - class name comparator
-- IllegalClassException - extra constructor for common instanceof case
-- NotImplementedException - supports nested exceptions
-- ObjectUtils - hashcode method handling null
-- StringUtils - isAsciiPrintable to check the contents of a string
-             -- ordinalIndexOf to find the nth index of a string
-             -- various remove methods to remove parts of a string
-             -- various split methods to provide more control over splitting a string
-             -- defaultIfEmpty to default a string if null or empty
-- SystemUtils - methods to get system properties as File objects
-             -- extra constants representing system properties
-- Validate - new methods to check whether all elements in a collection are of a specific type
-- WordUtils - new methods to capitalize based on a set of specified delimiters
+IMPROVEMENTS IN 2.2:
 
-- EqualsBuilder - now provides setter to internal state
-- ToStringStyle - new style, short prefix style
-- ReflectionToStringBuilder - more flags to control the output with regards to statics
+LANG-159  Add WordUtils.getInitials(String)
+LANG-161  Add methods and tests to StrBuilder
+LANG-162  replace() length calculation improvement
+LANG-165  parseDate with TimeZone
+LANG-166  New interpolation features
+LANG-169  Implementation of escape/unescapeHtml methods with Writer
+LANG-176  CompareToBuilder excludeFields for reflection method
+LANG-186  Request for MutableBoolean implementation
+LANG-194  add generic add method to DateUtils
+LANG-198  New method for EqualsBuilder
+LANG-212  New ExceptionUtils method setCause()
+LANG-216  Provides a Class.getPublicMethod which returns public invocable Method
+LANG-217  Add Mutable<Type> to<Type>() methods.
+LANG-220  Tokenizer Enhancements: reset input string, static CSV/TSV factories
+LANG-226  Using ReflectionToStringBuilder and excluding secure fields
+LANG-242  Trivial cleanup of javadoc in various files
+LANG-246  CompositeFormat
+LANG-250  Performance boost for RandomStringUtils
+LANG-254  Enhanced Class.forName version
+LANG-260  StringEscapeUtils should expose escape*() methods taking Writer argument
+LANG-263  Add StringUtils.containsIgnoreCase(...)
+LANG-267  Support char array converters on ArrayUtils
+LANG-270  minor javadoc improvements for StringUtils.stripXxx() methods
+          New ExceptionUtils methods getMessage/getRootCauseMessage
 
-- ExceptionUtils - added indexOfType methods that check subclasses, thus leaving the existing
-indexOfThrowable method untouched (see incompatible changes section)
-
-- NumberUtils - various string to number parsing methods added
-
-- DateUtils - methods added to compare dates in various ways
-           -- method to parse a date string using multiple patterns
-- FastDateFormat - extra formatting methods that take in a millisecond long value
-                -- additional static factory methods
-- StopWatch - new methods for split behaviour
-
-
-BUG FIXES:
-
-19331  General case: infinite loop: ToStringBuilder.reflectionToString
-23174  EqualsBuilder.append(Object[], Object[]) throws NPE
-23356  Make DurationFormatUtils public!
-23557  WordUtils.capitalizeFully(String str) should take a delimiters
-23683  New method for converting a primitive Class to its corresponding wrapper
-23430  Minor javadoc fixes for StringUtils.contains(String, String)
-23590  make optional parameters in FastDateFormat really optional
-24056  Documentation error in StringUtils.replace
-25227  StringEscapeUtils.unescapeHtml() doesn't handle hex entities
-25454  new StringUtils.replaceChars behaves differently from old Ch
-25560  DateUtils.truncate() is off by one hour when using a date in DST switch 'zone'
-25627  DateUtils constants should be long
-25683  Add method that validates Collection elements are a correct
-25849  Add SystemUtils methods for directory properties.
-26616  ClassCastException in Enum.equals(Object)
-26699  Tokenizer Enhancements: reset input string, static CSV
-26734  NullPointerException in EqualsBuilder.append(Object[], Object[])
-26877  Add SystemUtils.AWT_TOOLKIT and others.
-26922  public static boolean DateUtils.equals(Date dt1, Date dt2)
-27592  WordUtils capitalize improvement
-27876  ReflectionToStringBuilder.toString(null) throws exception by design
-27877  Make ClassUtils methods null-safe and not throw an IAE.
-28468  StringUtils.defaultString: Documentation error
-28554  Add hashCode-support to class ObjectUtils
-29082  Enhancement of ExceptionUtils.CAUSE_METHOD_NAMES
-29149  StringEscapeUtils.unescapeHtml() doesn't handle an empty entity
-29294  lang.math.Fraction class deficiencies
-29673  ExceptionUtils: new getCause() methodname (for tomcat)
-29794  Add convenience format(long) methods to FastDateForma
-30328  HashCodeBuilder does not use the same values as Boolean (fixed as documentation)
-30334  New class proposal: CharacterEncoding
-30674  parseDate class from HttpClient's DateParser class
-30815  ArrayUtils.isEquals() throws ClassCastException when array1
-30929  Nestable.indexOfThrowable(Class)  uses Class.equals() to match
-31395  DateUtils.truncate oddity at the far end of the Date spectrum
-31478  Compile error with JDK 5 "enum" is a keyword
-31572  o.a.c.lang.enum.ValuedEnum: 'enum'is a keyword in JDK1.5.0
-31933  ToStringStyle setArrayEnd handled null incorrectly
-32133  SystemUtils fails init on HP-UX
-32198  Error in JavaDoc for StringUtils.chomp(String, String)
-32625  Can't subclass EqualsBuilder because isEquals is private
-33067  EqualsBuilder.append(Object[], Object[]) crashes with a NullPointerException if an element of the first array is null
-33069  EqualsBuilder.append(Object[], Object[]) incorrectly checks that rhs[i] is instance of lhs[i]'s class
-33574  unbalanced ReflectionToStringBuilder
-33737  ExceptionUtils.addCauseMethodName(String) does not check for duplicates.

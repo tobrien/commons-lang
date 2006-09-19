@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -81,20 +82,27 @@ public class MutableIntTest extends TestCase {
     }
 
     public void testEquals() {
-        final MutableInt mutNumA = new MutableInt(0);
-        final MutableInt mutNumB = new MutableInt(0);
-        final MutableInt mutNumC = new MutableInt(1);
+        this.testEquals(new MutableInt(0), new MutableInt(0), new MutableInt(1));
+        // Should Numbers be supported? GaryG July-21-2005.
+        //this.testEquals(mutNumA, new Integer(0), mutNumC);
+    }
 
-        assertEquals(true, mutNumA.equals(mutNumA));
-        assertEquals(true, mutNumA.equals(mutNumB));
-        assertEquals(true, mutNumB.equals(mutNumA));
-        assertEquals(true, mutNumB.equals(mutNumB));
-        assertEquals(false, mutNumA.equals(mutNumC));
-        assertEquals(false, mutNumB.equals(mutNumC));
-        assertEquals(true, mutNumC.equals(mutNumC));
-        assertEquals(false, mutNumA.equals(null));
-        assertEquals(false, mutNumA.equals(new Integer(0)));
-        assertEquals(false, mutNumA.equals("0"));
+    /**
+     * @param numA must not be a 0 Integer; must not equal numC.
+     * @param numB must equal numA; must not equal numC.
+     * @param numC must not equal numA; must not equal numC.
+     */
+    void testEquals(final Number numA, final Number numB, final Number numC) {
+        assertEquals(true, numA.equals(numA));
+        assertEquals(true, numA.equals(numB));
+        assertEquals(true, numB.equals(numA));
+        assertEquals(true, numB.equals(numB));
+        assertEquals(false, numA.equals(numC));
+        assertEquals(false, numB.equals(numC));
+        assertEquals(true, numC.equals(numC));
+        assertEquals(false, numA.equals(null));
+        assertEquals(false, numA.equals(new Integer(0)));
+        assertEquals(false, numA.equals("0"));
     }
 
     public void testHashCode() {
@@ -136,6 +144,59 @@ public class MutableIntTest extends TestCase {
         assertEquals( 1.0F, mutNum.floatValue(), 0 );
         assertEquals( 1.0, mutNum.doubleValue(), 0 );
         assertEquals( 1L, mutNum.longValue() );
+    }
+
+    public void testToInteger() {
+        assertEquals(new Integer(0), new MutableInt(0).toInteger());
+        assertEquals(new Integer(123), new MutableInt(123).toInteger());
+    }
+
+    public void testIncrement() {
+        MutableInt mutNum = new MutableInt(1);
+        mutNum.increment();
+        
+        assertEquals(2, mutNum.intValue());
+        assertEquals(2L, mutNum.longValue());
+    }
+
+    public void testDecrement() {
+        MutableInt mutNum = new MutableInt(1);
+        mutNum.decrement();
+        
+        assertEquals(0, mutNum.intValue());
+        assertEquals(0L, mutNum.longValue());
+    }
+
+    public void testAddValuePrimitive() {
+        MutableInt mutNum = new MutableInt(1);
+        mutNum.add(1);
+        
+        assertEquals(2, mutNum.intValue());
+        assertEquals(2L, mutNum.longValue());
+    }
+
+    public void testAddValueObject() {
+        MutableInt mutNum = new MutableInt(1);
+        mutNum.add(new Integer(1));
+        
+        assertEquals(2, mutNum.intValue());
+        assertEquals(2L, mutNum.longValue());
+    }
+
+    public void testSubtractValuePrimitive() {
+        MutableInt mutNum = new MutableInt(1);
+        mutNum.subtract(1);
+        
+        assertEquals(0, mutNum.intValue());
+        assertEquals(0L, mutNum.longValue());
+    }
+
+    public void testSubtractValueObject() {
+        MutableInt mutNum = new MutableInt(1);
+        mutNum.subtract(new Integer(1));
+        
+        assertEquals(0, mutNum.intValue());
+        assertEquals(0L, mutNum.longValue());
     }
 
     public void testToString() {

@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -14,6 +15,8 @@
  * limitations under the License.
  */
 package org.apache.commons.lang.enums;
+
+import java.net.URLClassLoader;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -87,4 +90,61 @@ public final class EnumEqualsTest extends TestCase {
         assertEquals(false, TrafficlightColorEnum.RED.equals(new TotallyUnrelatedClass("some")));
         assertEquals(false, CarColorEnum.RED.equals(new TotallyUnrelatedClass("some")));
     }
+
+    public void testEquals_classloader_equal() throws Exception {
+        ClassLoader cl = ColorEnum.class.getClassLoader();
+        if (cl instanceof URLClassLoader) {
+            URLClassLoader urlCL = (URLClassLoader) cl;
+            URLClassLoader urlCL1 = new URLClassLoader(urlCL.getURLs(), null);
+            URLClassLoader urlCL2 = new URLClassLoader(urlCL.getURLs(), null);
+            Class otherEnumClass1 = urlCL1.loadClass("org.apache.commons.lang.enums.ColorEnum");
+            Class otherEnumClass2 = urlCL2.loadClass("org.apache.commons.lang.enums.ColorEnum");
+            Object blue1 = otherEnumClass1.getDeclaredField("BLUE").get(null);
+            Object blue2 = otherEnumClass2.getDeclaredField("BLUE").get(null);
+            assertEquals(true, blue1.equals(blue2));
+        }
+    }
+
+    public void testEquals_classloader_different() throws Exception {
+        ClassLoader cl = ColorEnum.class.getClassLoader();
+        if (cl instanceof URLClassLoader) {
+            URLClassLoader urlCL = (URLClassLoader) cl;
+            URLClassLoader urlCL1 = new URLClassLoader(urlCL.getURLs(), null);
+            URLClassLoader urlCL2 = new URLClassLoader(urlCL.getURLs(), null);
+            Class otherEnumClass1 = urlCL1.loadClass("org.apache.commons.lang.enums.ColorEnum");
+            Class otherEnumClass2 = urlCL2.loadClass("org.apache.commons.lang.enums.ColorEnum");
+            Object blue1 = otherEnumClass1.getDeclaredField("BLUE").get(null);
+            Object blue2 = otherEnumClass2.getDeclaredField("RED").get(null);
+            assertEquals(false, blue1.equals(blue2));
+        }
+    }
+
+    //-----------------------------------------------------------------------
+    public void testCompareTo() {
+        try {
+            CarColorEnum.RED.compareTo(TrafficlightColorEnum.RED);
+            fail();
+        } catch (ClassCastException ex) {}
+        try {
+            CarColorEnum.YELLOW.compareTo(TrafficlightColorEnum.YELLOW);
+            fail();
+        } catch (ClassCastException ex) {}
+        try {
+            TrafficlightColorEnum.RED.compareTo(new TotallyUnrelatedClass("red"));
+            fail();
+        } catch (ClassCastException ex) {}
+        try {
+            CarColorEnum.RED.compareTo(new TotallyUnrelatedClass("red"));
+            fail();
+        } catch (ClassCastException ex) {}
+        try {
+            TrafficlightColorEnum.RED.compareTo(new TotallyUnrelatedClass("some"));
+            fail();
+        } catch (ClassCastException ex) {}
+        try {
+            CarColorEnum.RED.compareTo(new TotallyUnrelatedClass("some"));
+            fail();
+        } catch (ClassCastException ex) {}
+    }
+
 }

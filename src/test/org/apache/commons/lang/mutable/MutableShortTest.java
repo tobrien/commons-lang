@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -137,6 +138,55 @@ public class MutableShortTest extends TestCase {
         assertEquals( (short) 1, mutNum.shortValue() );
         assertEquals( 1, mutNum.intValue() );
         assertEquals( 1L, mutNum.longValue() );
+    }
+
+    public void testToShort() {
+        assertEquals(new Short((short) 0), new MutableShort((short) 0).toShort());
+        assertEquals(new Short((short) 123), new MutableShort((short) 123).toShort());
+    }
+
+    public void testIncrement() {
+        MutableShort mutNum = new MutableShort((short) 1);
+        mutNum.increment();
+        
+        assertEquals(2, mutNum.intValue());
+        assertEquals(2L, mutNum.longValue());
+    }
+
+    public void testDecrement() {
+        MutableShort mutNum = new MutableShort((short) 1);
+        mutNum.decrement();
+        
+        assertEquals(0, mutNum.intValue());
+        assertEquals(0L, mutNum.longValue());
+    }
+
+    public void testAddValuePrimitive() {
+        MutableShort mutNum = new MutableShort((short) 1);
+        mutNum.add((short) 1);
+        
+        assertEquals((short) 2, mutNum.shortValue());
+    }
+
+    public void testAddValueObject() {
+        MutableShort mutNum = new MutableShort((short) 1);
+        mutNum.add(new Short((short) 1));
+        
+        assertEquals((short) 2, mutNum.shortValue());
+    }
+
+    public void testSubtractValuePrimitive() {
+        MutableShort mutNum = new MutableShort((short) 1);
+        mutNum.subtract((short) 1);
+        
+        assertEquals((short) 0, mutNum.shortValue());
+    }
+
+    public void testSubtractValueObject() {
+        MutableShort mutNum = new MutableShort((short) 1);
+        mutNum.subtract(new Short((short) 1));
+        
+        assertEquals((short) 0, mutNum.shortValue());
     }
 
     public void testToString() {

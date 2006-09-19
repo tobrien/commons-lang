@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -16,12 +17,16 @@
 package org.apache.commons.lang;
 
 import java.lang.reflect.Constructor;
+import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.net.URL;
 import java.net.URLClassLoader;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Set;
+import java.util.HashSet;
+import java.util.Collections;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -352,6 +357,8 @@ public class ClassUtilsTest extends TestCase {
         assertEquals("ClassUtils.class -> ClassUtils.class",
             org.apache.commons.lang.ClassUtils.class, 
             ClassUtils.primitiveToWrapper(org.apache.commons.lang.ClassUtils.class));
+        assertEquals("Void.TYPE -> Void.TYPE",
+            Void.TYPE, ClassUtils.primitiveToWrapper(Void.TYPE));
             
         // test null     
         assertNull("null -> null",
@@ -384,10 +391,114 @@ public class ClassUtilsTest extends TestCase {
 
         // test an array of no primitive classes
         final Class[] noPrimitives = new Class[] {
-                String.class, ClassUtils.class
+                String.class, ClassUtils.class, Void.TYPE
         };
         // This used to return the exact same array, but no longer does.
         assertNotSame("unmodified", noPrimitives, ClassUtils.primitivesToWrappers(noPrimitives));
+    }
+
+    public void testGetClassClassNotFound() throws Exception {
+        assertGetClassThrowsClassNotFound( "bool" );
+        assertGetClassThrowsClassNotFound( "bool[]" );
+        assertGetClassThrowsClassNotFound( "integer[]" );
+    }
+
+    public void testGetClassInvalidArguments() throws Exception {
+        assertGetClassThrowsIllegalArgument( null );
+        assertGetClassThrowsClassNotFound( "[][][]" );
+        assertGetClassThrowsClassNotFound( "[[]" );
+        assertGetClassThrowsClassNotFound( "[" );
+        assertGetClassThrowsClassNotFound( "java.lang.String][" );
+        assertGetClassThrowsClassNotFound( ".hello.world" );
+        assertGetClassThrowsClassNotFound( "hello..world" );
+    }
+
+    public void testWithInterleavingWhitespace() throws ClassNotFoundException {
+        assertEquals( int[].class, ClassUtils.getClass( " int [ ] " ) );
+        assertEquals( long[].class, ClassUtils.getClass( "\rlong\t[\n]\r" ) );
+        assertEquals( short[].class, ClassUtils.getClass( "\tshort                \t\t[]" ) );
+        assertEquals( byte[].class, ClassUtils.getClass( "byte[\t\t\n\r]   " ) );
+    }
+
+    public void testGetClassByNormalNameArrays() throws ClassNotFoundException {
+        assertEquals( int[].class, ClassUtils.getClass( "int[]" ) );
+        assertEquals( long[].class, ClassUtils.getClass( "long[]" ) );
+        assertEquals( short[].class, ClassUtils.getClass( "short[]" ) );
+        assertEquals( byte[].class, ClassUtils.getClass( "byte[]" ) );
+        assertEquals( char[].class, ClassUtils.getClass( "char[]" ) );
+        assertEquals( float[].class, ClassUtils.getClass( "float[]" ) );
+        assertEquals( double[].class, ClassUtils.getClass( "double[]" ) );
+        assertEquals( boolean[].class, ClassUtils.getClass( "boolean[]" ) );
+        assertEquals( String[].class, ClassUtils.getClass( "java.lang.String[]" ) );
+    }
+
+    public void testGetClassByNormalNameArrays2D() throws ClassNotFoundException {
+        assertEquals( int[][].class, ClassUtils.getClass( "int[][]" ) );
+        assertEquals( long[][].class, ClassUtils.getClass( "long[][]" ) );
+        assertEquals( short[][].class, ClassUtils.getClass( "short[][]" ) );
+        assertEquals( byte[][].class, ClassUtils.getClass( "byte[][]" ) );
+        assertEquals( char[][].class, ClassUtils.getClass( "char[][]" ) );
+        assertEquals( float[][].class, ClassUtils.getClass( "float[][]" ) );
+        assertEquals( double[][].class, ClassUtils.getClass( "double[][]" ) );
+        assertEquals( boolean[][].class, ClassUtils.getClass( "boolean[][]" ) );
+        assertEquals( String[][].class, ClassUtils.getClass( "java.lang.String[][]" ) );
+    }
+
+    public void testGetClassWithArrayClasses2D() throws Exception {
+        assertGetClassReturnsClass( String[][].class );
+        assertGetClassReturnsClass( int[][].class );
+        assertGetClassReturnsClass( long[][].class );
+        assertGetClassReturnsClass( short[][].class );
+        assertGetClassReturnsClass( byte[][].class );
+        assertGetClassReturnsClass( char[][].class );
+        assertGetClassReturnsClass( float[][].class );
+        assertGetClassReturnsClass( double[][].class );
+        assertGetClassReturnsClass( boolean[][].class );
+    }
+
+    public void testGetClassWithArrayClasses() throws Exception {
+        assertGetClassReturnsClass( String[].class );
+        assertGetClassReturnsClass( int[].class );
+        assertGetClassReturnsClass( long[].class );
+        assertGetClassReturnsClass( short[].class );
+        assertGetClassReturnsClass( byte[].class );
+        assertGetClassReturnsClass( char[].class );
+        assertGetClassReturnsClass( float[].class );
+        assertGetClassReturnsClass( double[].class );
+        assertGetClassReturnsClass( boolean[].class );
+    }
+
+    public void testGetClassRawPrimitives() throws ClassNotFoundException {
+        assertEquals( int.class, ClassUtils.getClass( "int" ) );
+        assertEquals( long.class, ClassUtils.getClass( "long" ) );
+        assertEquals( short.class, ClassUtils.getClass( "short" ) );
+        assertEquals( byte.class, ClassUtils.getClass( "byte" ) );
+        assertEquals( char.class, ClassUtils.getClass( "char" ) );
+        assertEquals( float.class, ClassUtils.getClass( "float" ) );
+        assertEquals( double.class, ClassUtils.getClass( "double" ) );
+        assertEquals( boolean.class, ClassUtils.getClass( "boolean" ) );
+    }
+
+    private void assertGetClassReturnsClass( Class c ) throws Exception {
+        assertEquals( c, ClassUtils.getClass( c.getName() ) );
+    }
+
+    private void assertGetClassThrowsException( String className, Class exceptionType ) throws Exception {
+        try {
+            ClassUtils.getClass( className );
+            fail( "ClassUtils.getClass() should fail with an exception of type " + exceptionType.getName() + " when given class name \"" + className + "\"." );
+        }
+        catch( Exception e ) {
+            assertTrue( exceptionType.isAssignableFrom( e.getClass() ) );
+        }
+    }
+
+    private void assertGetClassThrowsIllegalArgument( String className ) throws Exception {
+        assertGetClassThrowsException( className, IllegalArgumentException.class );
+    }
+
+    private void assertGetClassThrowsClassNotFound( String className ) throws Exception {
+        assertGetClassThrowsException( className, ClassNotFoundException.class );
     }
 
     /**
@@ -414,4 +525,35 @@ public class ClassUtilsTest extends TestCase {
         return URLClassLoader.newInstance(urlScl.getURLs(), null);
     }
 
+    // Show the Java bug: http://bugs.sun.com/bugdatabase/view_bug.do?bug_id=4071957
+    // We may have to delete this if a JDK fixes the bug.
+    public void testShowJavaBug() throws Exception {
+        // Tests with Collections$UnmodifiableSet
+        Set set = Collections.unmodifiableSet(new HashSet());
+        Method isEmptyMethod = set.getClass().getMethod("isEmpty",  new Class[0]);
+        try {
+            isEmptyMethod.invoke(set, new Object[0]);
+            fail("Failed to throw IllegalAccessException as expected");
+        } catch(IllegalAccessException iae) {
+            // expected
+        }
+    }
+
+    public void testGetPublicMethod() throws Exception {
+        // Tests with Collections$UnmodifiableSet
+        Set set = Collections.unmodifiableSet(new HashSet());
+        Method isEmptyMethod = ClassUtils.getPublicMethod(set.getClass(), "isEmpty",  new Class[0]);
+            assertTrue(Modifier.isPublic(isEmptyMethod.getDeclaringClass().getModifiers()));
+ 
+        try {
+            isEmptyMethod.invoke(set, new Object[0]);
+        } catch(java.lang.IllegalAccessException iae) {
+            fail("Should not have thrown IllegalAccessException");
+        }
+               
+        // Tests with a public Class
+        Method toStringMethod = ClassUtils.getPublicMethod(Object.class, "toString",  new Class[0]);
+            assertEquals(Object.class.getMethod("toString", new Class[0]), toStringMethod);
+    }
+ 
 }

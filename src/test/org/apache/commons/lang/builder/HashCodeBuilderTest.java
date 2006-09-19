@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -14,6 +15,9 @@
  * limitations under the License.
  */
 package org.apache.commons.lang.builder;
+
+import org.apache.commons.lang.builder.ToStringBuilderTest.ReflectionTestCycleA;
+import org.apache.commons.lang.builder.ToStringBuilderTest.ReflectionTestCycleB;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
@@ -28,6 +32,28 @@ import junit.textui.TestRunner;
  */
 public class HashCodeBuilderTest extends TestCase {
 
+    /**
+     * A reflection test fixture.
+     */
+    static class ReflectionTestCycleA {
+        ReflectionTestCycleB b;
+
+        public int hashCode() {
+            return HashCodeBuilder.reflectionHashCode(this);
+        }
+    }
+
+    /**
+     * A reflection test fixture.
+     */
+    static class ReflectionTestCycleB {
+        ReflectionTestCycleA a;
+
+        public int hashCode() {
+            return HashCodeBuilder.reflectionHashCode(this);
+        }
+    }
+    
     public HashCodeBuilderTest(String name) {
         super(name);
     }
@@ -435,6 +461,65 @@ public class HashCodeBuilderTest extends TestCase {
         assertEquals(((17 * 37 + 0) * 37 + 1) * 37, new HashCodeBuilder(17, 37).append(obj).toHashCode());
         obj[1] = new boolean[1];
         assertEquals( (((17 * 37 + 0) * 37 + 1) * 37 + 1), new HashCodeBuilder(17, 37).append(obj).toHashCode());
+    }
+
+    public void testReflectionHashCodeExcludeFields() throws Exception {
+        TestObjectWithMultipleFields x = new TestObjectWithMultipleFields(1, 2, 3);
+
+        assertEquals((((17 * 37 + 1) * 37 + 2) * 37 + 3), HashCodeBuilder.reflectionHashCode(x));
+
+        assertEquals((((17 * 37 + 1) * 37 + 2) * 37 + 3), HashCodeBuilder.reflectionHashCode(x, (String[]) null));
+        assertEquals((((17 * 37 + 1) * 37 + 2) * 37 + 3), HashCodeBuilder.reflectionHashCode(x, new String[] {}));
+        assertEquals((((17 * 37 + 1) * 37 + 2) * 37 + 3), HashCodeBuilder.reflectionHashCode(x, new String[] {"xxx"}));
+
+        assertEquals(((17 * 37 + 1) * 37 + 3), HashCodeBuilder.reflectionHashCode(x, new String[] {"two"}));
+        assertEquals(((17 * 37 + 1) * 37 + 2), HashCodeBuilder.reflectionHashCode(x, new String[] {"three"}));
+
+        assertEquals((17 * 37 + 1), HashCodeBuilder.reflectionHashCode(x, new String[] {"two", "three"}));
+
+        assertEquals(17, HashCodeBuilder.reflectionHashCode(x, new String[] {"one", "two", "three"}));
+        assertEquals(17, HashCodeBuilder.reflectionHashCode(x, new String[] {"one", "two", "three", "xxx"}));
+    }
+
+    static class TestObjectWithMultipleFields {
+        private int one = 0;
+        private int two = 0;
+        private int three = 0;
+
+        public TestObjectWithMultipleFields(int one, int two, int three) {
+            this.one = one;
+            this.two = two;
+            this.three = three;
+        }
+    }
+    
+    /**
+     * Test Objects pointing to each other.
+     */
+    public void testReflectionObjectCycle() {
+        ReflectionTestCycleA a = new ReflectionTestCycleA();
+        ReflectionTestCycleB b = new ReflectionTestCycleB();
+        a.b = b;
+        b.a = a;
+        // Causes:
+        // java.lang.StackOverflowError
+        // at java.lang.ClassLoader.getCallerClassLoader(Native Method)
+        // at java.lang.Class.getDeclaredFields(Class.java:992)
+        // at org.apache.commons.lang.builder.HashCodeBuilder.reflectionAppend(HashCodeBuilder.java:373)
+        // at org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode(HashCodeBuilder.java:349)
+        // at org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode(HashCodeBuilder.java:155)
+        // at
+        // org.apache.commons.lang.builder.HashCodeBuilderTest$ReflectionTestCycleB.hashCode(HashCodeBuilderTest.java:53)
+        // at org.apache.commons.lang.builder.HashCodeBuilder.append(HashCodeBuilder.java:422)
+        // at org.apache.commons.lang.builder.HashCodeBuilder.reflectionAppend(HashCodeBuilder.java:383)
+        // at org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode(HashCodeBuilder.java:349)
+        // at org.apache.commons.lang.builder.HashCodeBuilder.reflectionHashCode(HashCodeBuilder.java:155)
+        // at
+        // org.apache.commons.lang.builder.HashCodeBuilderTest$ReflectionTestCycleA.hashCode(HashCodeBuilderTest.java:42)
+        // at org.apache.commons.lang.builder.HashCodeBuilder.append(HashCodeBuilder.java:422)
+
+        // a.hashCode();
+        // b.hashCode();
     }
 
 }

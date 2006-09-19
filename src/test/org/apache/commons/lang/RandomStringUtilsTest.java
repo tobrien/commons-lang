@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -81,7 +82,7 @@ public class RandomStringUtilsTest extends junit.framework.TestCase {
         r1 = RandomStringUtils.randomAscii(50);
         assertEquals("randomAscii(50) length", 50, r1.length());
         for(int i = 0; i < r1.length(); i++) {
-            assertTrue("char between 32 and 127", (int) r1.charAt(i) >= 32 && (int) r1.charAt(i) <= 127);
+            assertTrue("char between 32 and 127", r1.charAt(i) >= 32 && r1.charAt(i) <= 127);
         }        
         r2 = RandomStringUtils.randomAscii(50);
         assertTrue("!r1.equals(r2)", !r1.equals(r2));
@@ -309,13 +310,39 @@ public class RandomStringUtilsTest extends junit.framework.TestCase {
     private double chiSquare(int[] expected, int[] observed) {
         double sumSq = 0.0d;
         double dev = 0.0d;
-        for (int i = 0; i< observed.length; i++) {
-            dev = (double)(observed[i] - expected[i]);
-            sumSq += dev*dev/(double)expected[i];
+        for (int i = 0; i < observed.length; i++) {
+            dev = (double) (observed[i] - expected[i]);
+            sumSq += dev * dev / (double) expected[i];
         }
         return sumSq;
     }           
-        
+
+    /**
+     * Checks if the string got by {@link RandomStringUtils#random(int)}
+     * can be converted to UTF-8 and back without loss.
+     *
+     * @author stefanhoehne@fastmail.fm
+     * @throws Exception
+     */
+    public void testLang100() throws Exception {
+        int size = 5000;
+        String encoding = "UTF-8";
+        String orig = RandomStringUtils.random(size);
+        byte[] bytes = orig.getBytes(encoding);
+        String copy = new String(bytes, encoding);
+
+        // for a verbose compare:
+        for (int i=0; i < orig.length() && i < copy.length(); i++) {
+            char o = orig.charAt(i);
+            char c = copy.charAt(i);
+            assertEquals("differs at " + i + "(" + Integer.toHexString((new Character(o)).hashCode()) + "," +
+            Integer.toHexString((new Character(c)).hashCode()) + ")", o, c);
+        }
+        // compare length also
+        assertEquals(orig.length(), copy.length());
+        // just to be complete
+        assertEquals(orig, copy);
+    }
 
     public static void main(String args[]) {
         TestRunner.run(suite());

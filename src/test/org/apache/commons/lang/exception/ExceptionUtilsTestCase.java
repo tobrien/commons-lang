@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -15,21 +16,42 @@
  */
 package org.apache.commons.lang.exception;
 
+import java.lang.reflect.Constructor;
+import java.lang.reflect.Modifier;
 import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.StringWriter;
 import java.lang.reflect.InvocationTargetException;
 import java.sql.SQLException;
+import java.util.List;
 
 import junit.framework.Assert;
 import junit.framework.Test;
 import junit.framework.TestSuite;
+
 import org.apache.commons.lang.SystemUtils;
 
 /**
  * Tests {@link org.apache.commons.lang.exception.ExceptionUtils}.
- *
+ * 
+ * <h3>Notes</h3>
+ * <p>
+ * Make sure this exception code does not depend on Java 1.4 nested exceptions. SVN revision 38990 does not compile with
+ * Java 1.3.1.
+ * </p>
+ * <ul>
+ * <li>Compiled with Sun Java 1.3.1_15</li>
+ * <li>Tested with Sun Java 1.3.1_15</li>
+ * <li>Tested with Sun Java 1.4.2_12</li>
+ * <li>Tested with Sun Java 1.5.0_08</li>
+ * <li>All of the above on Windows XP SP2 + patches.</li>
+ * </ul>
+ * <p>
+ * Gary Gregory; August 16, 2006.
+ * </p>
+ * 
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
  * @author <a href="mailto:steven@caswell.name">Steven Caswell</a>
  * @author Stephen Colebourne
@@ -41,6 +63,9 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
     private NestableException nested;
     private Throwable withCause;
     private Throwable withoutCause;
+    private Throwable jdkNoCause;
+    private ExceptionWithCause selfCause;
+    private ExceptionWithCause cyclicCause;
 
     public ExceptionUtilsTestCase(String name) {
         super(name);
@@ -54,6 +79,22 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
         withoutCause = createExceptionWithoutCause();
         nested = new NestableException(withoutCause);
         withCause = new ExceptionWithCause(nested);
+        jdkNoCause = new NullPointerException();
+        selfCause = new ExceptionWithCause(null);
+        selfCause.setCause(selfCause);
+        ExceptionWithCause a = new ExceptionWithCause(null);
+        ExceptionWithCause b = new ExceptionWithCause(a);
+        a.setCause(b);
+        cyclicCause = new ExceptionWithCause(a);
+    }
+
+    protected void tearDown() throws Exception {
+        withoutCause = null;
+        nested = null;
+        withCause = null;
+        jdkNoCause = null;
+        selfCause = null;
+        cyclicCause = null;
     }
 
     //-----------------------------------------------------------------------
@@ -77,6 +118,17 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
         }
     }
 
+    //-----------------------------------------------------------------------
+    
+    public void testConstructor() {
+        assertNotNull(new ExceptionUtils());
+        Constructor[] cons = ExceptionUtils.class.getDeclaredConstructors();
+        assertEquals(1, cons.length);
+        assertEquals(true, Modifier.isPublic(cons[0].getModifiers()));
+        assertEquals(true, Modifier.isPublic(ExceptionUtils.class.getModifiers()));
+        assertEquals(false, Modifier.isFinal(ExceptionUtils.class.getModifiers()));
+    }
+    
     //-----------------------------------------------------------------------
     
     public void testCauseMethodNameOps() {
@@ -107,6 +159,11 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
         assertSame(null, ExceptionUtils.getCause(withoutCause));
         assertSame(withoutCause, ExceptionUtils.getCause(nested));
         assertSame(nested, ExceptionUtils.getCause(withCause));
+        assertSame(null, ExceptionUtils.getCause(jdkNoCause));
+        assertSame(selfCause, ExceptionUtils.getCause(selfCause));
+        assertSame(cyclicCause.getCause(), ExceptionUtils.getCause(cyclicCause));
+        assertSame(((ExceptionWithCause) cyclicCause.getCause()).getCause(), ExceptionUtils.getCause(cyclicCause.getCause()));
+        assertSame(cyclicCause.getCause(), ExceptionUtils.getCause(((ExceptionWithCause) cyclicCause.getCause()).getCause()));
     }
 
     public void testGetCause_ThrowableArray() {
@@ -137,6 +194,28 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
         assertSame(null, ExceptionUtils.getRootCause(withoutCause));
         assertSame(withoutCause, ExceptionUtils.getRootCause(nested));
         assertSame(withoutCause, ExceptionUtils.getRootCause(withCause));
+        assertSame(null, ExceptionUtils.getRootCause(jdkNoCause));
+        assertSame(null, ExceptionUtils.getRootCause(selfCause));
+        assertSame(((ExceptionWithCause) cyclicCause.getCause()).getCause(), ExceptionUtils.getRootCause(cyclicCause));
+    }
+
+    public void testSetCause() {
+        Exception cause = new ExceptionWithoutCause();
+        assertEquals(true, ExceptionUtils.setCause(new ExceptionWithCause(null), cause));
+        if (SystemUtils.isJavaVersionAtLeast(140)) {
+            assertEquals(true, ExceptionUtils.setCause(new ExceptionWithoutCause(), cause));
+        }
+    }
+
+    /**
+     * Tests overriding a cause to <code>null</code>.
+     */
+    public void testSetCauseToNull() {
+        Exception ex = new ExceptionWithCause(new IOException());
+        assertEquals(true, ExceptionUtils.setCause(ex, new IllegalStateException()));
+        assertNotNull(ExceptionUtils.getCause(ex));
+        assertEquals(true, ExceptionUtils.setCause(ex, null));
+        assertNull(ExceptionUtils.getCause(ex));
     }
 
     //-----------------------------------------------------------------------
@@ -169,21 +248,102 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
         assertEquals(1, ExceptionUtils.getThrowableCount(withoutCause));
         assertEquals(2, ExceptionUtils.getThrowableCount(nested));
         assertEquals(3, ExceptionUtils.getThrowableCount(withCause));
+        assertEquals(1, ExceptionUtils.getThrowableCount(jdkNoCause));
+        assertEquals(1, ExceptionUtils.getThrowableCount(selfCause));
+        assertEquals(3, ExceptionUtils.getThrowableCount(cyclicCause));
     }
 
-    public void testGetThrowables_Throwable() {
+    //-----------------------------------------------------------------------
+    public void testGetThrowables_Throwable_null() {
         assertEquals(0, ExceptionUtils.getThrowables(null).length);
-        assertEquals(1, ExceptionUtils.getThrowables(withoutCause).length);
-        assertSame(withoutCause, ExceptionUtils.getThrowables(withoutCause)[0]);
-        
-        assertEquals(2, ExceptionUtils.getThrowables(nested).length);
-        assertSame(nested, ExceptionUtils.getThrowables(nested)[0]);
-        assertSame(withoutCause, ExceptionUtils.getThrowables(nested)[1]);
-        
-        assertEquals(3, ExceptionUtils.getThrowables(withCause).length);
-        assertSame(withCause, ExceptionUtils.getThrowables(withCause)[0]);
-        assertSame(nested, ExceptionUtils.getThrowables(withCause)[1]);
-        assertSame(withoutCause, ExceptionUtils.getThrowables(withCause)[2]);
+    }
+
+    public void testGetThrowables_Throwable_withoutCause() {
+        Throwable[] throwables = ExceptionUtils.getThrowables(withoutCause);
+        assertEquals(1, throwables.length);
+        assertSame(withoutCause, throwables[0]);
+    }
+
+    public void testGetThrowables_Throwable_nested() {
+        Throwable[] throwables = ExceptionUtils.getThrowables(nested);
+        assertEquals(2, throwables.length);
+        assertSame(nested, throwables[0]);
+        assertSame(withoutCause, throwables[1]);
+    }
+
+    public void testGetThrowables_Throwable_withCause() {
+        Throwable[] throwables = ExceptionUtils.getThrowables(withCause);
+        assertEquals(3, throwables.length);
+        assertSame(withCause, throwables[0]);
+        assertSame(nested, throwables[1]);
+        assertSame(withoutCause, throwables[2]);
+    }
+
+    public void testGetThrowables_Throwable_jdkNoCause() {
+        Throwable[] throwables = ExceptionUtils.getThrowables(jdkNoCause);
+        assertEquals(1, throwables.length);
+        assertSame(jdkNoCause, throwables[0]);
+    }
+
+    public void testGetThrowables_Throwable_selfCause() {
+        Throwable[] throwables = ExceptionUtils.getThrowables(selfCause);
+        assertEquals(1, throwables.length);
+        assertSame(selfCause, throwables[0]);
+    }
+
+    public void testGetThrowables_Throwable_recursiveCause() {
+        Throwable[] throwables = ExceptionUtils.getThrowables(cyclicCause);
+        assertEquals(3, throwables.length);
+        assertSame(cyclicCause, throwables[0]);
+        assertSame(cyclicCause.getCause(), throwables[1]);
+        assertSame(((ExceptionWithCause) cyclicCause.getCause()).getCause(), throwables[2]);
+    }
+
+    //-----------------------------------------------------------------------
+    public void testGetThrowableList_Throwable_null() {
+        List throwables = ExceptionUtils.getThrowableList(null);
+        assertEquals(0, throwables.size());
+    }
+
+    public void testGetThrowableList_Throwable_withoutCause() {
+        List throwables = ExceptionUtils.getThrowableList(withoutCause);
+        assertEquals(1, throwables.size());
+        assertSame(withoutCause, throwables.get(0));
+    }
+
+    public void testGetThrowableList_Throwable_nested() {
+        List throwables = ExceptionUtils.getThrowableList(nested);
+        assertEquals(2, throwables.size());
+        assertSame(nested, throwables.get(0));
+        assertSame(withoutCause, throwables.get(1));
+    }
+
+    public void testGetThrowableList_Throwable_withCause() {
+        List throwables = ExceptionUtils.getThrowableList(withCause);
+        assertEquals(3, throwables.size());
+        assertSame(withCause, throwables.get(0));
+        assertSame(nested, throwables.get(1));
+        assertSame(withoutCause, throwables.get(2));
+    }
+
+    public void testGetThrowableList_Throwable_jdkNoCause() {
+        List throwables = ExceptionUtils.getThrowableList(jdkNoCause);
+        assertEquals(1, throwables.size());
+        assertSame(jdkNoCause, throwables.get(0));
+    }
+
+    public void testGetThrowableList_Throwable_selfCause() {
+        List throwables = ExceptionUtils.getThrowableList(selfCause);
+        assertEquals(1, throwables.size());
+        assertSame(selfCause, throwables.get(0));
+    }
+
+    public void testGetThrowableList_Throwable_recursiveCause() {
+        List throwables = ExceptionUtils.getThrowableList(cyclicCause);
+        assertEquals(3, throwables.size());
+        assertSame(cyclicCause, throwables.get(0));
+        assertSame(cyclicCause.getCause(), throwables.get(1));
+        assertSame(((ExceptionWithCause) cyclicCause.getCause()).getCause(), throwables.get(2));
     }
 
     //-----------------------------------------------------------------------
@@ -376,7 +536,29 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
         } catch (IllegalArgumentException ex) {
         }
     }
-    
+
+    public void test_getMessage_Throwable() {
+        Throwable th = null;
+        assertEquals("", ExceptionUtils.getMessage(th));
+        
+        th = new IllegalArgumentException("Base");
+        assertEquals("IllegalArgumentException: Base", ExceptionUtils.getMessage(th));
+        
+        th = new ExceptionWithCause("Wrapper", th);
+        assertEquals("ExceptionUtilsTestCase.ExceptionWithCause: Wrapper", ExceptionUtils.getMessage(th));
+    }
+
+    public void test_getRootCauseMessage_Throwable() {
+        Throwable th = null;
+        assertEquals("", ExceptionUtils.getRootCauseMessage(th));
+        
+        th = new IllegalArgumentException("Base");
+        assertEquals("IllegalArgumentException: Base", ExceptionUtils.getRootCauseMessage(th));
+        
+        th = new ExceptionWithCause("Wrapper", th);
+        assertEquals("IllegalArgumentException: Base", ExceptionUtils.getRootCauseMessage(th));
+    }
+
     //-----------------------------------------------------------------------
     /**
      * Provides a method with a well known chained/nested exception
@@ -386,12 +568,22 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
     private static class ExceptionWithCause extends Exception {
         private Throwable cause;
 
+        public ExceptionWithCause(String str, Throwable cause) {
+            super(str);
+            setCause(cause);
+        }
+
         public ExceptionWithCause(Throwable cause) {
-            this.cause = cause;
+            super();
+            setCause(cause);
         }
 
         public Throwable getCause() {
             return cause;
+        }
+
+        public void setCause(Throwable cause) {
+            this.cause = cause;
         }
     }
 
@@ -404,5 +596,5 @@ public class ExceptionUtilsTestCase extends junit.framework.TestCase {
         public void getTargetException() {
         }
     }
-    
+
 }

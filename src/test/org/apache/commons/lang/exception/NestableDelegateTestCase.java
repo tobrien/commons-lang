@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -214,6 +215,25 @@ public class NestableDelegateTestCase extends junit.framework.TestCase {
         {
             assertEquals("message " + i, nMsgs[i], dMsgs[i]);
         }
+    }
+    
+    public void testGetMessageString()
+    {
+        NestableDelegateTester1 ndt1 = new NestableDelegateTester1 (new NullPointerException ());
+        NestableDelegate nd = new NestableDelegate (ndt1);
+        assertNull (nd.getMessage((String)null));
+        
+        ndt1 = new NestableDelegateTester1 (new NullPointerException ("null pointer"));
+        nd = new NestableDelegate (ndt1);
+        assertNotNull(nd.getMessage((String)null));
+        
+        ndt1 = new NestableDelegateTester1 ();
+        nd = new NestableDelegate (ndt1);
+        assertNull(nd.getMessage((String)null));
+        
+        ndt1 = new NestableDelegateTester1 ("root");
+        nd = new NestableDelegate (ndt1);
+        assertNull(nd.getMessage((String)null));
     }
 
     public void testNestableDelegateGetMessageN()

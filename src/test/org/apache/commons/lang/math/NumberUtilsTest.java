@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -167,13 +168,17 @@ public class NumberUtilsTest extends TestCase {
     }
 
     public void testCreateNumber() {
-        //a lot of things can go wrong
+        // a lot of things can go wrong
         assertEquals("createNumber(String) 1 failed", new Float("1234.5"), NumberUtils.createNumber("1234.5"));
         assertEquals("createNumber(String) 2 failed", new Integer("12345"), NumberUtils.createNumber("12345"));
         assertEquals("createNumber(String) 3 failed", new Double("1234.5"), NumberUtils.createNumber("1234.5D"));
+        assertEquals("createNumber(String) 3 failed", new Double("1234.5"), NumberUtils.createNumber("1234.5d"));
         assertEquals("createNumber(String) 4 failed", new Float("1234.5"), NumberUtils.createNumber("1234.5F"));
-        assertEquals("createNumber(String) 5 failed", new Long(Integer.MAX_VALUE + 1L), NumberUtils.createNumber("" + (Integer.MAX_VALUE + 1L)));
+        assertEquals("createNumber(String) 4 failed", new Float("1234.5"), NumberUtils.createNumber("1234.5f"));
+        assertEquals("createNumber(String) 5 failed", new Long(Integer.MAX_VALUE + 1L), NumberUtils.createNumber(""
+            + (Integer.MAX_VALUE + 1L)));
         assertEquals("createNumber(String) 6 failed", new Long(12345), NumberUtils.createNumber("12345L"));
+        assertEquals("createNumber(String) 6 failed", new Long(12345), NumberUtils.createNumber("12345l"));
         assertEquals("createNumber(String) 7 failed", new Float("-1234.5"), NumberUtils.createNumber("-1234.5"));
         assertEquals("createNumber(String) 8 failed", new Integer("-12345"), NumberUtils.createNumber("-12345"));
         assertTrue("createNumber(String) 9 failed", 0xFADE == NumberUtils.createNumber("0xFADE").intValue());
@@ -183,24 +188,20 @@ public class NumberUtilsTest extends TestCase {
         assertEquals("createNumber(String) 13 failed", new Double("-1.1E200"), NumberUtils.createNumber("-1.1E200"));
         assertEquals("createNumber(String) 14 failed", new Double("1.1E-200"), NumberUtils.createNumber("1.1E-200"));
         assertEquals("createNumber(null) failed", null, NumberUtils.createNumber(null));
-        
-        // jdk 1.2 doesn't support this. unsure about jdk 1.2.2
-        if(SystemUtils.isJavaVersionAtLeast(1.3f)) { 
-            assertEquals("createNumber(String) 15 failed", new BigDecimal("1.1E-700"), NumberUtils.createNumber("1.1E-700F"));
-        }
-        assertEquals(
-            "createNumber(String) 16 failed",
-            new Long("10" + Integer.MAX_VALUE),
-            NumberUtils.createNumber("10" + Integer.MAX_VALUE + "L"));
-        assertEquals(
-            "createNumber(String) 17 failed",
-            new Long("10" + Integer.MAX_VALUE),
-            NumberUtils.createNumber("10" + Integer.MAX_VALUE));
-        assertEquals(
-            "createNumber(String) 18 failed",
-            new BigInteger("10" + Long.MAX_VALUE),
-            NumberUtils.createNumber("10" + Long.MAX_VALUE));
+        assertEquals("createNumber(String) failed", new BigInteger("12345678901234567890"), NumberUtils
+                .createNumber("12345678901234567890L"));
 
+        // jdk 1.2 doesn't support this. unsure about jdk 1.2.2
+        if (SystemUtils.isJavaVersionAtLeast(1.3f)) {
+            assertEquals("createNumber(String) 15 failed", new BigDecimal("1.1E-700"), NumberUtils
+                    .createNumber("1.1E-700F"));
+        }
+        assertEquals("createNumber(String) 16 failed", new Long("10" + Integer.MAX_VALUE), NumberUtils
+                .createNumber("10" + Integer.MAX_VALUE + "L"));
+        assertEquals("createNumber(String) 17 failed", new Long("10" + Integer.MAX_VALUE), NumberUtils
+                .createNumber("10" + Integer.MAX_VALUE));
+        assertEquals("createNumber(String) 18 failed", new BigInteger("10" + Long.MAX_VALUE), NumberUtils
+                .createNumber("10" + Long.MAX_VALUE));
     }
 
     public void testCreateFloat() {

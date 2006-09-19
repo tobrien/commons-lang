@@ -1,9 +1,10 @@
 <!--
-Copyright 2002-2005 The Apache Software Foundation.
- 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements.  See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License.  You may obtain a copy of the License at
 
      http://www.apache.org/licenses/LICENSE-2.0
 
@@ -19,14 +20,15 @@ limitations under the License.
 </properties>
 <body>
 
+<!-- $Id$ -->
 
-<section name='Developers guide for Jakarta Commons "Lang"'>
+<section name='Developer guide for Jakarta Commons "Lang"'>
 
 
 <div align="center">
 <h1>The Jakarta Commons <em>Lang</em> Package</h1>
 <h2>Developers Guide</h2>
-$Id$<br />
+<br />
 <a href="#Introduction">[Introduction]</a>
 <a href="#PackageStructure">[Package Structure]</a>
 <a href="#UtilityClasses">[Utility Classes]</a>
@@ -40,7 +42,7 @@ $Id$<br />
 <h3>1.  INTRODUCTION</h3>
 
 <p>The <em>Lang</em> package contains a set of Java classes that extend
-the basic JDK classes. This developers guide seeks to set
+the basic JDK classes. This developer guide seeks to set
 out rules for the naming of classes and methods within the package. The purpose
 of this, as with all naming standards, is to improve the coherency and
 consistency of the whole API.</p>
@@ -138,19 +140,6 @@ Lots of spelling differences will creep in all over.</p>
 
 <a name="Building"></a>
 <h3>5.BUILDING</h3>
-<h4>Site Generation</h4>
-<p>Site generation via maven includes Clover report generation. Since Clover
-requires a license, the proper license file must be placed where the maven
-Clover plugin can find it. This can be done as follows:
-<ul>
-<li>Obtain the license file (clover.license) from the committers svn repository  (https://svn.apache.org/repos/private/committers/), in the donated-licenses path.</li>
-<li>Copy clover.license to the lang base directory (the top level directory where project.xml, maven.xml, etc. reside).</li>
-<li>Copy clover.license to your maven repository Clover licenses directory, named clover-[version].license, where [version] is the version specified in the
-project.properties <b>maven.jar.clover</b> property. For example, if
-<b>maven.jar.clover</b> is set to <b>1.3.2</b>, then the clover license file
-name should be <b>clover-1.3.2.license</b>.</li>
-</ul>
-</p>
 <h4>Building a Release</h4>
 <p>
 Commons Lang is intented to interoperate with Java version 1.2 and higher. To

@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -74,12 +75,15 @@ public class StopWatchTest extends TestCase {
             try {Thread.sleep(550);} catch (InterruptedException ex) {}
         watch.split();
         long splitTime = watch.getSplitTime();
+        String splitStr = watch.toSplitString();
             try {Thread.sleep(550);} catch (InterruptedException ex) {}
         watch.unsplit();
             try {Thread.sleep(550);} catch (InterruptedException ex) {}
         watch.stop();
         long totalTime = watch.getTime();
-        
+
+        assertEquals("Formatted split string not the correct length", 
+                     splitStr.length(), 11);
         assertTrue(splitTime >= 500);
         assertTrue(splitTime < 700);
         assertTrue(totalTime >= 1500);

@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.lang.mutable;
 
 import org.apache.commons.lang.math.NumberUtils;
@@ -27,7 +27,11 @@ import org.apache.commons.lang.math.NumberUtils;
  */
 public class MutableFloat extends Number implements Comparable, Mutable {
 
-    /** Serialization lock. */
+    /**
+     * Required for serialization support.
+     * 
+     * @see java.io.Serializable
+     */
     private static final long serialVersionUID = 5787169186L;
 
     /** The mutable value. */
@@ -99,6 +103,78 @@ public class MutableFloat extends Number implements Comparable, Mutable {
     }
 
     //-----------------------------------------------------------------------
+    /**
+     * Increments the value.
+     *
+     * @since Commons Lang 2.2
+     */
+    public void increment() {
+        value++;
+    }
+
+    /**
+     * Decrements the value.
+     *
+     * @since Commons Lang 2.2
+     */
+    public void decrement() {
+        value--;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a value.
+     * 
+     * @param operand
+     *            the value to add
+     *
+     * @since Commons Lang 2.2
+     */
+    public void add(float operand) {
+        this.value += operand;
+    }
+
+    /**
+     * Adds a value.
+     * 
+     * @param operand
+     *            the value to add
+     * @throws NullPointerException
+     *             if the object is null
+     *
+     * @since Commons Lang 2.2
+     */
+    public void add(Number operand) {
+        this.value += operand.floatValue();
+    }
+
+    /**
+     * Subtracts a value.
+     * 
+     * @param operand
+     *            the value to add
+     *
+     * @since Commons Lang 2.2
+     */
+    public void subtract(float operand) {
+        this.value -= operand;
+    }
+
+    /**
+     * Subtracts a value.
+     * 
+     * @param operand
+     *            the value to add
+     * @throws NullPointerException
+     *             if the object is null
+     *
+     * @since Commons Lang 2.2
+     */
+    public void subtract(Number operand) {
+        this.value -= operand.floatValue();
+    }
+
+    //-----------------------------------------------------------------------
     // shortValue and bytValue rely on Number implementation
     /**
      * Returns the value of this MutableFloat as a int.
@@ -154,6 +230,17 @@ public class MutableFloat extends Number implements Comparable, Mutable {
         return Float.isInfinite(value);
     }
 
+    //-----------------------------------------------------------------------
+    /**
+     * Gets this mutable as an instance of Float.
+     *
+     * @return a Float instance containing the value from this mutable
+     */
+    public Float toFloat() {
+        return new Float(floatValue());
+    }
+
+    //-----------------------------------------------------------------------
     /**
      * Compares this object against some other object. The result is <code>true</code> if and only if the argument is
      * not <code>null</code> and is a <code>Float</code> object that represents a <code>float</code> that has the

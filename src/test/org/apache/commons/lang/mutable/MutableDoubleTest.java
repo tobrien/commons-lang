@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -148,6 +149,55 @@ public class MutableDoubleTest extends TestCase {
         assertEquals( (short) 1, mutNum.shortValue() );
         assertEquals( 1, mutNum.intValue() );
         assertEquals( 1L, mutNum.longValue() );
+    }
+
+    public void testToDouble() {
+        assertEquals(new Double(0d), new MutableDouble(0d).toDouble());
+        assertEquals(new Double(12.3d), new MutableDouble(12.3d).toDouble());
+    }
+
+    public void testIncrement() {
+        MutableDouble mutNum = new MutableDouble(1);
+        mutNum.increment();
+        
+        assertEquals(2, mutNum.intValue());
+        assertEquals(2L, mutNum.longValue());
+    }
+
+    public void testDecrement() {
+        MutableDouble mutNum = new MutableDouble(1);
+        mutNum.decrement();
+        
+        assertEquals(0, mutNum.intValue());
+        assertEquals(0L, mutNum.longValue());
+    }
+
+    public void testAddValuePrimitive() {
+        MutableDouble mutNum = new MutableDouble(1);
+        mutNum.add(1.1d);
+        
+        assertEquals(2.1d, mutNum.doubleValue(), 0.01d);
+    }
+
+    public void testAddValueObject() {
+        MutableDouble mutNum = new MutableDouble(1);
+        mutNum.add(new Double(1.1d));
+        
+        assertEquals(2.1d, mutNum.doubleValue(), 0.01d);
+    }
+
+    public void testSubtractValuePrimitive() {
+        MutableDouble mutNum = new MutableDouble(1);
+        mutNum.subtract(0.9d);
+        
+        assertEquals(0.1d, mutNum.doubleValue(), 0.01d);
+    }
+
+    public void testSubtractValueObject() {
+        MutableDouble mutNum = new MutableDouble(1);
+        mutNum.subtract(new Double(0.9d));
+        
+        assertEquals(0.1d, mutNum.doubleValue(), 0.01d);
     }
 
     public void testToString() {

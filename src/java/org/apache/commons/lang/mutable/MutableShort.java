@@ -1,9 +1,10 @@
 /*
- * Copyright 2004-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -13,7 +14,6 @@
  * See the License for the specific language governing permissions and
  * limitations under the License.
  */
-
 package org.apache.commons.lang.mutable;
 
 /**
@@ -25,7 +25,11 @@ package org.apache.commons.lang.mutable;
  */
 public class MutableShort extends Number implements Comparable, Mutable {
 
-    /** Serialization lock. */
+    /**
+     * Required for serialization support.
+     * 
+     * @see java.io.Serializable
+     */
     private static final long serialVersionUID = -2135791679L;
 
     /** The mutable value. */
@@ -97,6 +101,78 @@ public class MutableShort extends Number implements Comparable, Mutable {
     }
 
     //-----------------------------------------------------------------------
+    /**
+     * Increments the value.
+     *
+     * @since Commons Lang 2.2
+     */
+    public void increment() {
+        value++;
+    }
+
+    /**
+     * Decrements the value.
+     *
+     * @since Commons Lang 2.2
+     */
+    public void decrement() {
+        value--;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a value.
+     * 
+     * @param operand
+     *            the value to add
+     *
+     * @since Commons Lang 2.2
+     */
+    public void add(short operand) {
+        this.value += operand;
+    }
+
+    /**
+     * Adds a value.
+     * 
+     * @param operand
+     *            the value to add
+     * @throws NullPointerException
+     *             if the object is null
+     *
+     * @since Commons Lang 2.2
+     */
+    public void add(Number operand) {
+        this.value += operand.shortValue();
+    }
+
+    /**
+     * Subtracts a value.
+     * 
+     * @param operand
+     *            the value to add
+     *
+     * @since Commons Lang 2.2
+     */
+    public void subtract(short operand) {
+        this.value -= operand;
+    }
+
+    /**
+     * Subtracts a value.
+     * 
+     * @param operand
+     *            the value to add
+     * @throws NullPointerException
+     *             if the object is null
+     *
+     * @since Commons Lang 2.2
+     */
+    public void subtract(Number operand) {
+        this.value -= operand.shortValue();
+    }
+
+    //-----------------------------------------------------------------------
     // bytValue relies on Number implementation
     /**
      * Returns the value of this MutableShort as a short.
@@ -141,6 +217,16 @@ public class MutableShort extends Number implements Comparable, Mutable {
      */
     public double doubleValue() {
         return value;
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Gets this mutable as an instance of Short.
+     *
+     * @return a Short instance containing the value from this mutable
+     */
+    public Short toShort() {
+        return new Short(shortValue());
     }
 
     //-----------------------------------------------------------------------

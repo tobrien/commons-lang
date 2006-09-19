@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -126,14 +127,27 @@ public class StringUtilsTest extends TestCase {
         assertEquals(null, StringUtils.upperCase(null));
         assertEquals(null, StringUtils.lowerCase(null));
         assertEquals(null, StringUtils.capitalize(null));
+        assertEquals(null, StringUtils.uncapitalise(null));
         assertEquals(null, StringUtils.uncapitalize(null));
 
+        assertEquals("capitalise(String) failed",
+                    FOO_CAP, StringUtils.capitalise(FOO_UNCAP) );
+        assertEquals("capitalise(empty-string) failed",
+                    "", StringUtils.capitalise("") );
+        assertEquals("capitalise(single-char-string) failed",
+                    "X", StringUtils.capitalise("x") );
         assertEquals("capitalize(String) failed",
                      FOO_CAP, StringUtils.capitalize(FOO_UNCAP) );
         assertEquals("capitalize(empty-string) failed",
                      "", StringUtils.capitalize("") );
         assertEquals("capitalize(single-char-string) failed",
                      "X", StringUtils.capitalize("x") );
+        assertEquals("uncapitalise(String) failed",
+                     FOO_UNCAP, StringUtils.uncapitalise(FOO_CAP) );
+        assertEquals("uncapitalise(empty-string) failed",
+                     "", StringUtils.uncapitalise("") );
+        assertEquals("uncapitalise(single-char-string) failed",
+                     "x", StringUtils.uncapitalise("X") );
         assertEquals("uncapitalize(String) failed",
                      FOO_UNCAP, StringUtils.uncapitalize(FOO_CAP) );
         assertEquals("uncapitalize(empty-string) failed",
@@ -142,16 +156,24 @@ public class StringUtilsTest extends TestCase {
                      "x", StringUtils.uncapitalize("X") );
                      
         // reflection type of tests: Sentences.
+        assertEquals("uncapitalise(capitalise(String)) failed",
+                     SENTENCE_UNCAP, StringUtils.uncapitalise(StringUtils.capitalise(SENTENCE_UNCAP)) );
+        assertEquals("capitalise(uncapitalise(String)) failed",
+                     SENTENCE_CAP, StringUtils.capitalise(StringUtils.uncapitalise(SENTENCE_CAP)) );
         assertEquals("uncapitalize(capitalize(String)) failed",
                      SENTENCE_UNCAP, StringUtils.uncapitalize(StringUtils.capitalize(SENTENCE_UNCAP)) );
         assertEquals("capitalize(uncapitalize(String)) failed",
                      SENTENCE_CAP, StringUtils.capitalize(StringUtils.uncapitalize(SENTENCE_CAP)) );
 
         // reflection type of tests: One word.
+        assertEquals("uncapitalise(capitalise(String)) failed",
+                     FOO_UNCAP, StringUtils.uncapitalise(StringUtils.capitalise(FOO_UNCAP)) );
+        assertEquals("capitalise(uncapitalise(String)) failed",
+                     FOO_CAP, StringUtils.capitalise(StringUtils.uncapitalise(FOO_CAP)) );
         assertEquals("uncapitalize(capitalize(String)) failed",
-                    FOO_UNCAP, StringUtils.uncapitalize(StringUtils.capitalize(FOO_UNCAP)) );
+                     FOO_UNCAP, StringUtils.uncapitalize(StringUtils.capitalize(FOO_UNCAP)) );
         assertEquals("capitalize(uncapitalize(String)) failed",
-                    FOO_CAP, StringUtils.capitalize(StringUtils.uncapitalize(FOO_CAP)) );
+                     FOO_CAP, StringUtils.capitalize(StringUtils.uncapitalize(FOO_CAP)) );
 
         assertEquals("upperCase(String) failed",
                      "FOO TEST THING", StringUtils.upperCase("fOo test THING") );
@@ -161,6 +183,7 @@ public class StringUtilsTest extends TestCase {
                      "foo test thing", StringUtils.lowerCase("fOo test THING") );
         assertEquals("lowerCase(empty-string) failed",
                      "", StringUtils.lowerCase("") );
+        
     }
 
     public void testSwapCase_String() {
@@ -174,6 +197,10 @@ public class StringUtilsTest extends TestCase {
         assertEquals("i aM hERE 123", StringUtils.swapCase("I Am Here 123") );
         assertEquals("I AM here 123", StringUtils.swapCase("i am HERE 123") );
         assertEquals("i am here 123", StringUtils.swapCase("I AM HERE 123") );
+        
+        String test = "This String contains a TitleCase character: \u01C8";
+        String expect = "tHIS sTRING CONTAINS A tITLEcASE CHARACTER: \u01C9";
+        assertEquals(expect, WordUtils.swapCase(test));
     }
 
     //-----------------------------------------------------------------------
@@ -382,6 +409,13 @@ public class StringUtilsTest extends TestCase {
         for ( int i = 0 ; i < splitOnStringExpectedResults.length ; i+= 1 ) {
             assertEquals( splitOnStringExpectedResults[i], splitOnStringResults[i] ) ;
         }
+
+        String[] splitWithMultipleSeparatorExpectedResults = {"ab", "cd", "ef"};
+        String[] splitWithMultipleSeparator = StringUtils.splitByWholeSeparator("ab:cd::ef", ":");
+        assertEquals( splitWithMultipleSeparatorExpectedResults.length, splitWithMultipleSeparator.length );
+        for( int i = 0; i < splitWithMultipleSeparatorExpectedResults.length ; i++ ) {
+            assertEquals( splitWithMultipleSeparatorExpectedResults[i], splitWithMultipleSeparator[i] ) ;
+        }
     }
 
     public void testSplitByWholeString_StringStringBooleanInt() {
@@ -415,8 +449,28 @@ public class StringUtilsTest extends TestCase {
         assertEquals(null, StringUtils.splitPreserveAllTokens(null));
         assertEquals(0, StringUtils.splitPreserveAllTokens("").length);
         
-        String str = "a b .c";
+        String str = "abc def";
         String[] res = StringUtils.splitPreserveAllTokens(str);
+        assertEquals(2, res.length);
+        assertEquals("abc", res[0]);
+        assertEquals("def", res[1]);
+        
+        str = "abc  def";
+        res = StringUtils.splitPreserveAllTokens(str);
+        assertEquals(3, res.length);
+        assertEquals("abc", res[0]);
+        assertEquals("", res[1]);
+        assertEquals("def", res[2]);
+        
+        str = " abc ";
+        res = StringUtils.splitPreserveAllTokens(str);
+        assertEquals(3, res.length);
+        assertEquals("", res[0]);
+        assertEquals("abc", res[1]);
+        assertEquals("", res[2]);
+        
+        str = "a b .c";
+        res = StringUtils.splitPreserveAllTokens(str);
         assertEquals(3, res.length);
         assertEquals("a", res[0]);
         assertEquals("b", res[1]);
@@ -548,6 +602,33 @@ public class StringUtilsTest extends TestCase {
         assertEquals("b", res[3]);
         assertEquals("c", res[4]);
 
+        str = "a b c ";
+        res = StringUtils.splitPreserveAllTokens(str,' ');
+        assertEquals(4, res.length);
+        assertEquals("a", res[0]);
+        assertEquals("b", res[1]);
+        assertEquals("c", res[2]);
+        assertEquals("", res[3]);
+
+        str = "a b c  ";
+        res = StringUtils.splitPreserveAllTokens(str,' ');
+        assertEquals(5, res.length);
+        assertEquals("a", res[0]);
+        assertEquals("b", res[1]);
+        assertEquals("c", res[2]);
+        assertEquals("", res[3]);
+        assertEquals("", res[3]);
+
+        // Match example in javadoc
+        {
+          String[] results = null;
+          String[] expectedResults = {"a", "", "b", "c"};
+          results = StringUtils.splitPreserveAllTokens("a..b.c",'.');
+          assertEquals(expectedResults.length, results.length);
+          for (int i = 0; i < expectedResults.length; i++) {
+              assertEquals(expectedResults[i], results[i]);
+          }
+        }
     }
     
     public void testSplitPreserveAllTokens_StringString_StringStringInt() {
@@ -677,6 +758,7 @@ public class StringUtilsTest extends TestCase {
               assertEquals(expectedResults[i], results[i]);
           }
         }
+        
     }
     
     private void innerTestSplitPreserveAllTokens(char separator, String sepStr, char noMatch) {
@@ -771,12 +853,23 @@ public class StringUtilsTest extends TestCase {
         assertEquals(null, StringUtils.replace(null, "any", null, 2));
         assertEquals(null, StringUtils.replace(null, "any", "any", 2));
 
+        assertEquals("", StringUtils.replace("", null, null, 2));
+        assertEquals("", StringUtils.replace("", null, "any", 2));
+        assertEquals("", StringUtils.replace("", "any", null, 2));
+        assertEquals("", StringUtils.replace("", "any", "any", 2));
+        
+        String str = new String(new char[] {'o', 'o', 'f', 'o', 'o'});
+        assertSame(str, StringUtils.replace(str, "x", "", -1));
+        
         assertEquals("f", StringUtils.replace("oofoo", "o", "", -1));
         assertEquals("oofoo", StringUtils.replace("oofoo", "o", "", 0));
         assertEquals("ofoo", StringUtils.replace("oofoo", "o", "", 1));
         assertEquals("foo", StringUtils.replace("oofoo", "o", "", 2));
         assertEquals("fo", StringUtils.replace("oofoo", "o", "", 3));
         assertEquals("f", StringUtils.replace("oofoo", "o", "", 4));
+        
+        assertEquals("f", StringUtils.replace("oofoo", "o", "", -5));
+        assertEquals("f", StringUtils.replace("oofoo", "o", "", 1000));
     }
     
     public void testReplaceOnce_StringStringString() {
@@ -917,15 +1010,28 @@ public class StringUtilsTest extends TestCase {
         assertEquals("chompLast(String) failed",
                      FOO_UNCAP, StringUtils.chompLast(FOO_UNCAP + "\n") );
 
+        assertEquals("chompLast(\"\") failed",
+            "", StringUtils.chompLast("") );
+        assertEquals("chompLast(\"test\", \"test\") failed",
+            "test", StringUtils.chompLast("test", "tst") );
+        
         assertEquals("getChomp(String, String) failed",
                      "\n" + FOO_UNCAP, StringUtils.getChomp(FOO_UNCAP + "\n" + FOO_UNCAP, "\n") );
+        assertEquals("getChomp(String, String) failed",
+                     FOO_CAP, StringUtils.getChomp(FOO_CAP+FOO_CAP, FOO_CAP));
+        assertEquals("getChomp(String, String) failed",
+                     "", StringUtils.getChomp(FOO_UNCAP, FOO_CAP));
 
         assertEquals("prechomp(String, String) failed",
                      FOO_UNCAP, StringUtils.prechomp(FOO_UNCAP + "\n" + FOO_UNCAP, "\n") );
-
+        assertEquals("prechomp(String, String) failed",
+                     FOO_UNCAP, StringUtils.prechomp(FOO_UNCAP, FOO_CAP));
+        
         assertEquals("getPrechomp(String, String) failed",
                      FOO_UNCAP + "\n", StringUtils.getPrechomp(FOO_UNCAP + "\n" + FOO_UNCAP, "\n") );
-
+        assertEquals("getPrechomp(String, String) failed",
+                     "", StringUtils.getPrechomp(FOO_CAP, FOO_UNCAP));
+        
         assertEquals("chopNewline(String, String) failed",
                      FOO_UNCAP, StringUtils.chopNewline(FOO_UNCAP + "\r\n") );
     }
@@ -1080,6 +1186,7 @@ public class StringUtilsTest extends TestCase {
         assertEquals("     ", StringUtils.leftPad("", 5, ' '));
         assertEquals("  abc", StringUtils.leftPad("abc", 5, ' '));
         assertEquals("xxabc", StringUtils.leftPad("abc", 5, 'x'));
+        assertEquals("\uffff\uffffabc", StringUtils.leftPad("abc", 5, '\uffff'));
         assertEquals("abc", StringUtils.leftPad("abc", 2, ' '));
         String str = StringUtils.leftPad("aaa", 10000, 'a');  // bigger than pad length
         assertEquals(10000, str.length());
@@ -1308,6 +1415,7 @@ public class StringUtilsTest extends TestCase {
         assertEquals(7, StringUtils.indexOfDifference("i am a machine", "i am a robot"));
         assertEquals(-1, StringUtils.indexOfDifference("foo", "foo"));
         assertEquals(0, StringUtils.indexOfDifference("i am a robot", "you are a robot"));
+        //System.out.println("indexOfDiff: " + StringUtils.indexOfDifference("i am a robot", "not machine"));
     }
 
     //-----------------------------------------------------------------------
@@ -1374,6 +1482,7 @@ public class StringUtilsTest extends TestCase {
         assertEquals(StringUtils.removeEnd("", "a"), "");
         
         // All others:
+        assertEquals(StringUtils.removeEnd("www.domain.com.", ".com"), "www.domain.com.");
         assertEquals(StringUtils.removeEnd("www.domain.com", ".com"), "www.domain");
         assertEquals(StringUtils.removeEnd("www.domain", ".com"), "www.domain");
         assertEquals(StringUtils.removeEnd("domain.com", ""), "domain.com");   

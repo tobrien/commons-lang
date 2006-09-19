@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -120,6 +121,7 @@ public class DateUtils {
      * instance to operate.</p>
      */
     public DateUtils() {
+        super();
     }
 
     //-----------------------------------------------------------------------
@@ -267,6 +269,139 @@ public class DateUtils {
             }
         }
         throw new ParseException("Unable to parse the date: " + str, -1);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a number of years to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date addYears(Date date, int amount) {
+        return add(date, Calendar.YEAR, amount);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a number of months to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date addMonths(Date date, int amount) {
+        return add(date, Calendar.MONTH, amount);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a number of weeks to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date addWeeks(Date date, int amount) {
+        return add(date, Calendar.WEEK_OF_YEAR, amount);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a number of days to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date addDays(Date date, int amount) {
+        return add(date, Calendar.DAY_OF_MONTH, amount);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a number of hours to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date addHours(Date date, int amount) {
+        return add(date, Calendar.HOUR_OF_DAY, amount);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a number of minutes to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date addMinutes(Date date, int amount) {
+        return add(date, Calendar.MINUTE, amount);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a number of seconds to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date addSeconds(Date date, int amount) {
+        return add(date, Calendar.SECOND, amount);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds a number of milliseconds to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date addMilliseconds(Date date, int amount) {
+        return add(date, Calendar.MILLISECOND, amount);
+    }
+
+    //-----------------------------------------------------------------------
+    /**
+     * Adds to a date returning a new object.
+     * The original date object is unchanged.
+     *
+     * @param date  the date, not null
+     * @param calendarField  the calendar field to add to
+     * @param amount  the amount to add, may be negative
+     * @return the new date object with the amount added
+     * @throws IllegalArgumentException if the date is null
+     */
+    public static Date add(Date date, int calendarField, int amount) {
+        if (date == null) {
+            throw new IllegalArgumentException("The date must not be null");
+        }
+        Calendar c = Calendar.getInstance();
+        c.setTime(date);
+        c.add(calendarField, amount);
+        return c.getTime();
     }
 
     //-----------------------------------------------------------------------
@@ -487,6 +622,51 @@ public class DateUtils {
             throw new ArithmeticException("Calendar value too large for accurate calculations");
         }
         
+        if (field == Calendar.MILLISECOND) {
+            return;
+        }
+
+        // ----------------- Fix for LANG-59 ---------------------- START ---------------
+        // see http://issues.apache.org/jira/browse/LANG-59
+        //
+        // Manually truncate milliseconds, seconds and minutes, rather than using
+        // Calendar methods.
+
+        Date date = val.getTime();
+        long time = date.getTime();
+        boolean done = false;
+
+        // truncate milliseconds
+        int millisecs = val.get(Calendar.MILLISECOND);
+        if (!round || millisecs < 500) {
+            time = time - millisecs;
+            if (field == Calendar.SECOND) {
+                done = true;
+            }
+        }
+
+        // truncate seconds
+        int seconds = val.get(Calendar.SECOND);
+        if (!done && (!round || seconds < 30)) {
+            time = time - (seconds * 1000L);
+            if (field == Calendar.MINUTE) {
+                done = true;
+            }
+        }
+
+        // truncate minutes
+        int minutes = val.get(Calendar.MINUTE);
+        if (!done && (!round || minutes < 30)) {
+            time = time - (minutes * 60000L);
+        }
+
+        // reset time
+        if (date.getTime() != time) {
+            date.setTime(time);
+            val.setTime(date);
+        }
+        // ----------------- Fix for LANG-59 ----------------------- END ----------------
+
         boolean roundUp = false;
         for (int i = 0; i < fields.length; i++) {
             for (int j = 0; j < fields[i].length; j++) {
@@ -555,7 +735,9 @@ public class DateUtils {
                 roundUp = offset > ((max - min) / 2);
             }
             //We need to remove this field
-            val.set(fields[i][0], val.get(fields[i][0]) - offset);
+            if (offset != 0) {
+                val.set(fields[i][0], val.get(fields[i][0]) - offset);
+            }
         }
         throw new IllegalArgumentException("The field " + field + " is not supported");
 
@@ -563,22 +745,28 @@ public class DateUtils {
 
     //-----------------------------------------------------------------------
     /**
-     * <p>This constructs an <code>Iterator</code> that will
-     * start and stop over a date range based on the focused
-     * date and the range style.</p>
+     * <p>This constructs an <code>Iterator</code> over each day in a date
+     * range defined by a focus date and range style.</p>
      *
      * <p>For instance, passing Thursday, July 4, 2002 and a
-     * <code>RANGE_MONTH_SUNDAY</code> will return an
-     * <code>Iterator</code> that starts with Sunday, June 30,
-     * 2002 and ends with Saturday, August 3, 2002.
-     * 
-     * @param focus  the date to work with
-     * @param rangeStyle  the style constant to use. Must be one of the range
-     * styles listed for the {@link #iterator(Calendar, int)} method.
+     * <code>RANGE_MONTH_SUNDAY</code> will return an <code>Iterator</code>
+     * that starts with Sunday, June 30, 2002 and ends with Saturday, August 3,
+     * 2002, returning a Calendar instance for each intermediate day.</p>
      *
-     * @return the date iterator
-     * @throws IllegalArgumentException if the date is <code>null</code> or if
-     * the rangeStyle is not 
+     * <p>This method provides an iterator that returns Calendar objects.
+     * The days are progressed using {@link Calendar#add(int, int)}.</p>
+     *
+     * @param focus  the date to work with, not null
+     * @param rangeStyle  the style constant to use. Must be one of
+     * {@link DateUtils#RANGE_MONTH_SUNDAY}, 
+     * {@link DateUtils#RANGE_MONTH_MONDAY},
+     * {@link DateUtils#RANGE_WEEK_SUNDAY},
+     * {@link DateUtils#RANGE_WEEK_MONDAY},
+     * {@link DateUtils#RANGE_WEEK_RELATIVE},
+     * {@link DateUtils#RANGE_WEEK_CENTER}
+     * @return the date iterator, which always returns Calendar instances
+     * @throws IllegalArgumentException if the date is <code>null</code>
+     * @throws IllegalArgumentException if the rangeStyle is invalid
      */
     public static Iterator iterator(Date focus, int rangeStyle) {
         if (focus == null) {
@@ -590,15 +778,17 @@ public class DateUtils {
     }
 
     /**
-     * <p>This constructs an <code>Iterator</code> that will
-     * start and stop over a date range based on the focused
-     * date and the range style.</p>
+     * <p>This constructs an <code>Iterator</code> over each day in a date
+     * range defined by a focus date and range style.</p>
      *
      * <p>For instance, passing Thursday, July 4, 2002 and a
-     * <code>RANGE_MONTH_SUNDAY</code> will return an
-     * <code>Iterator</code> that starts with Sunday, June 30,
-     * 2002 and ends with Saturday, August 3, 2002.
-     * 
+     * <code>RANGE_MONTH_SUNDAY</code> will return an <code>Iterator</code>
+     * that starts with Sunday, June 30, 2002 and ends with Saturday, August 3,
+     * 2002, returning a Calendar instance for each intermediate day.</p>
+     *
+     * <p>This method provides an iterator that returns Calendar objects.
+     * The days are progressed using {@link Calendar#add(int, int)}.</p>
+     *
      * @param focus  the date to work with
      * @param rangeStyle  the style constant to use. Must be one of
      * {@link DateUtils#RANGE_MONTH_SUNDAY}, 
@@ -609,6 +799,7 @@ public class DateUtils {
      * {@link DateUtils#RANGE_WEEK_CENTER}
      * @return the date iterator
      * @throws IllegalArgumentException if the date is <code>null</code>
+     * @throws IllegalArgumentException if the rangeStyle is invalid
      */
     public static Iterator iterator(Calendar focus, int rangeStyle) {
         if (focus == null) {
@@ -683,15 +874,14 @@ public class DateUtils {
     }
 
     /**
-     * <p>This constructs an <code>Iterator</code> that will
-     * start and stop over a date range based on the focused
-     * date and the range style.</p>
+     * <p>This constructs an <code>Iterator</code> over each day in a date
+     * range defined by a focus date and range style.</p>
      *
      * <p>For instance, passing Thursday, July 4, 2002 and a
-     * <code>RANGE_MONTH_SUNDAY</code> will return an
-     * <code>Iterator</code> that starts with Sunday, June 30,
-     * 2002 and ends with Saturday, August 3, 2002.</p>
-     * 
+     * <code>RANGE_MONTH_SUNDAY</code> will return an <code>Iterator</code>
+     * that starts with Sunday, June 30, 2002 and ends with Saturday, August 3,
+     * 2002, returning a Calendar instance for each intermediate day.</p>
+     *
      * @param focus  the date to work with, either
      *  <code>Date</code> or <code>Calendar</code>
      * @param rangeStyle  the style constant to use. Must be one of the range

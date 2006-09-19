@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -16,6 +17,7 @@
 package org.apache.commons.lang;
 
 import java.io.IOException;
+import java.io.StringWriter;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Modifier;
 
@@ -105,9 +107,9 @@ public class StringEscapeUtilsTest extends TestCase {
         message = "escapeJava(String) failed" + (message == null ? "" : (": " + message));
         assertEquals(message, expected, converted);
 
-        StringPrintWriter writer = new StringPrintWriter();
+        StringWriter writer = new StringWriter();
         StringEscapeUtils.escapeJava(writer, original);
-        assertEquals(expected, writer.getString());
+        assertEquals(expected, writer.toString());
     }
 
     public void testUnescapeJava() throws IOException {
@@ -127,7 +129,7 @@ public class StringEscapeUtilsTest extends TestCase {
         } catch (IllegalArgumentException ex) {
         }
         try {
-            String str = StringEscapeUtils.unescapeJava("\\u02-3");
+            StringEscapeUtils.unescapeJava("\\u02-3");
             fail();
         } catch (RuntimeException ex) {
         }
@@ -159,9 +161,9 @@ public class StringEscapeUtilsTest extends TestCase {
                 "' actual '" + StringEscapeUtils.escapeJava(actual) + "'",
                 expected, actual);
 
-        StringPrintWriter writer = new StringPrintWriter();
+        StringWriter writer = new StringWriter();
         StringEscapeUtils.unescapeJava(writer, original);
-        assertEquals(unescaped, writer.getString());
+        assertEquals(unescaped, writer.toString());
 
     }
 
@@ -210,12 +212,12 @@ public class StringEscapeUtilsTest extends TestCase {
             String expected = htmlEscapes[i][1];
             String original = htmlEscapes[i][2];
             assertEquals(message, expected, StringEscapeUtils.escapeHtml(original));
-            StringPrintWriter sw = new StringPrintWriter();
+            StringWriter sw = new StringWriter();
             try {
             StringEscapeUtils.escapeHtml(sw, original);
             } catch (IOException e) {
             }
-            String actual = original == null ? null : sw.getString();
+            String actual = original == null ? null : sw.toString();
             assertEquals(message, expected, actual);
         }
     }
@@ -227,12 +229,12 @@ public class StringEscapeUtilsTest extends TestCase {
             String original = htmlEscapes[i][1];
             assertEquals(message, expected, StringEscapeUtils.unescapeHtml(original));
             
-            StringPrintWriter sw = new StringPrintWriter();
+            StringWriter sw = new StringWriter();
             try {
             StringEscapeUtils.unescapeHtml(sw, original);
             } catch (IOException e) {
             }
-            String actual = original == null ? null : sw.getString();
+            String actual = original == null ? null : sw.toString();
             assertEquals(message, expected, actual);
         }
         // \u00E7 is a cedilla (c with wiggle under)
@@ -255,8 +257,8 @@ public class StringEscapeUtilsTest extends TestCase {
             Character c1 = new Character(i);
             Character c2 = new Character((char)(i+1));
             String expected = c1.toString() + c2.toString();
-            String escapedC1 = "&#x" + Integer.toHexString((int)(c1.charValue())) + ";";
-            String escapedC2 = "&#x" + Integer.toHexString((int)(c2.charValue())) + ";";
+            String escapedC1 = "&#x" + Integer.toHexString((c1.charValue())) + ";";
+            String escapedC2 = "&#x" + Integer.toHexString((c2.charValue())) + ";";
             assertEquals("hex number unescape index " + (int)i, expected, StringEscapeUtils.unescapeHtml(escapedC1 + escapedC2));
         }
     }
@@ -289,6 +291,20 @@ public class StringEscapeUtilsTest extends TestCase {
         assertEquals("", StringEscapeUtils.escapeXml(""));
         assertEquals(null, StringEscapeUtils.escapeXml(null));
         assertEquals(null, StringEscapeUtils.unescapeXml(null));
+
+        StringWriter sw = new StringWriter();
+        try {
+            StringEscapeUtils.escapeXml(sw, "<abc>");
+        } catch (IOException e) {
+        }
+        assertEquals("XML was escaped incorrectly", "&lt;abc&gt;", sw.toString() );
+
+        sw = new StringWriter();
+        try {
+            StringEscapeUtils.unescapeXml(sw, "&lt;abc&gt;");
+        } catch (IOException e) {
+        }
+        assertEquals("XML was unescaped incorrectly", "<abc>", sw.toString() );
     }
 
     // SQL
@@ -301,5 +317,14 @@ public class StringEscapeUtilsTest extends TestCase {
         assertEquals("", StringEscapeUtils.escapeSql(""));
         assertEquals(null, StringEscapeUtils.escapeSql(null));
     }
-}
 
+    // Tests issue #38569
+    // http://issues.apache.org/bugzilla/show_bug.cgi?id=38569
+    public void testStandaloneAmphersand() {
+        assertEquals("<P&O>", StringEscapeUtils.unescapeHtml("&lt;P&O&gt;"));
+        assertEquals("test & <", StringEscapeUtils.unescapeHtml("test & &lt;"));
+        assertEquals("<P&O>", StringEscapeUtils.unescapeXml("&lt;P&O&gt;"));
+        assertEquals("test & <", StringEscapeUtils.unescapeXml("test & &lt;"));
+    }
+
+}

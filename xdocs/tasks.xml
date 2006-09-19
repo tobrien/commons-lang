@@ -1,10 +1,11 @@
 <?xml version="1.0"?>
 <!--
-Copyright 2002-2005 The Apache Software Foundation.
- 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+Licensed to the Apache Software Foundation (ASF) under one or more
+contributor license agreements.  See the NOTICE file distributed with
+this work for additional information regarding copyright ownership.
+The ASF licenses this file to You under the Apache License, Version 2.0
+(the "License"); you may not use this file except in compliance with
+the License.  You may obtain a copy of the License at
 
      http://www.apache.org/licenses/LICENSE-2.0
 
@@ -32,21 +33,10 @@ The following tasks are on the TODO list:
 
 <ul>
 <li>Improve maven script to generate previous version javadoc as per collections</li>
-<li>DateRange/Duration class</li>
 <li>CloneUtils - utility class to enable cloning via various different mechanisms</li>
 <li>CharUtils - Utilities to work on a char[] in the same way as a String</li>
 <li>StringBuf - A StringBuffer implementation with additional methods from StringUtils</li>
-<li>Money and Currency - Maybe separate project</li>
 <li>Code examples - Document as many static methods as possible with example usage</li>
-<li>Complete new Tokenizer class</li>
-</ul>
-
-<p>
-Post-2.1 release tasks TODO:
-</p>
-<ul>
-<li>Clean up checkstyle errors</li>
-<li>Remove checkstyle.properties from the repository since it appears to no longer be used</li>
 </ul>
 
 <p>

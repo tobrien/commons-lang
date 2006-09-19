@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -43,6 +44,14 @@ import org.apache.commons.lang.SystemUtils;
  * @author <a href="mailto:steve@mungoknotwise.com">Steven Caswell</a>
  */
 public class DateUtilsTest extends TestCase {
+
+    private static final long MILLIS_TEST;
+    static {
+        GregorianCalendar cal = new GregorianCalendar(2000, 6, 5, 4, 3, 2);
+        cal.set(Calendar.MILLISECOND, 1);
+        MILLIS_TEST = cal.getTime().getTime();
+    }
+
     DateFormat dateParser = null;
     DateFormat dateTimeParser = null;
     DateFormat timeZoneDateParser = null;
@@ -275,7 +284,191 @@ public class DateUtilsTest extends TestCase {
             fail();
         } catch (IllegalArgumentException ex) {}
     }
-    
+
+    //-----------------------------------------------------------------------
+    public void testAddYears() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.addYears(base, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addYears(base, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2001, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addYears(base, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 1999, 6, 5, 4, 3, 2, 1);
+    }
+
+    //-----------------------------------------------------------------------
+    public void testAddMonths() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.addMonths(base, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addMonths(base, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 7, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addMonths(base, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 5, 5, 4, 3, 2, 1);
+    }
+
+    //-----------------------------------------------------------------------
+    public void testAddWeeks() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.addWeeks(base, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addWeeks(base, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 12, 4, 3, 2, 1);
+        
+        result = DateUtils.addWeeks(base, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);      // july
+        assertDate(result, 2000, 5, 28, 4, 3, 2, 1);   // june
+    }
+
+    //-----------------------------------------------------------------------
+    public void testAddDays() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.addDays(base, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addDays(base, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 6, 4, 3, 2, 1);
+        
+        result = DateUtils.addDays(base, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 4, 4, 3, 2, 1);
+    }
+
+    //-----------------------------------------------------------------------
+    public void testAddHours() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.addHours(base, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addHours(base, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 5, 3, 2, 1);
+        
+        result = DateUtils.addHours(base, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 3, 3, 2, 1);
+    }
+
+    //-----------------------------------------------------------------------
+    public void testAddMinutes() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.addMinutes(base, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addMinutes(base, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 4, 2, 1);
+        
+        result = DateUtils.addMinutes(base, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 2, 2, 1);
+    }
+
+    //-----------------------------------------------------------------------
+    public void testAddSeconds() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.addSeconds(base, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addSeconds(base, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 3, 1);
+        
+        result = DateUtils.addSeconds(base, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 1, 1);
+    }
+
+    //-----------------------------------------------------------------------
+    public void testAddMilliseconds() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.addMilliseconds(base, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.addMilliseconds(base, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 2);
+        
+        result = DateUtils.addMilliseconds(base, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 0);
+    }
+
+    //-----------------------------------------------------------------------
+    public void testAddByField() throws Exception {
+        Date base = new Date(MILLIS_TEST);
+        Date result = DateUtils.add(base, Calendar.YEAR, 0);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2000, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.add(base, Calendar.YEAR, 1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 2001, 6, 5, 4, 3, 2, 1);
+        
+        result = DateUtils.add(base, Calendar.YEAR, -1);
+        assertNotSame(base, result);
+        assertDate(base, 2000, 6, 5, 4, 3, 2, 1);
+        assertDate(result, 1999, 6, 5, 4, 3, 2, 1);
+    }
+
+    //-----------------------------------------------------------------------
+    private void assertDate(Date date, int year, int month, int day, int hour, int min, int sec, int mil) throws Exception {
+        GregorianCalendar cal = new GregorianCalendar();
+        cal.setTime(date);
+        assertEquals(year, cal.get(Calendar.YEAR));
+        assertEquals(month, cal.get(Calendar.MONTH));
+        assertEquals(day, cal.get(Calendar.DAY_OF_MONTH));
+        assertEquals(hour, cal.get(Calendar.HOUR_OF_DAY));
+        assertEquals(min, cal.get(Calendar.MINUTE));
+        assertEquals(sec, cal.get(Calendar.SECOND));
+        assertEquals(mil, cal.get(Calendar.MILLISECOND));
+    }
+
     //-----------------------------------------------------------------------
     /**
      * Tests various values with the round method
@@ -303,6 +496,8 @@ public class DateUtilsTest extends TestCase {
         assertEquals("round semimonth-2 failed",
                 dateParser.parse("November 16, 2001"),
                 DateUtils.round(date2, DateUtils.SEMI_MONTH));
+        
+        
         assertEquals("round date-1 failed",
                 dateParser.parse("February 13, 2002"),
                 DateUtils.round(date1, Calendar.DATE));
@@ -491,7 +686,7 @@ public class DateUtilsTest extends TestCase {
                     dateTimeParser.parse("March 30, 2003 04:00:00.000"),
                     DateUtils.round((Object) cal7, Calendar.HOUR_OF_DAY));
         } else {
-            this.warn("Some date rounding tests not run since the current version is " + SystemUtils.JAVA_VERSION);
+            this.warn("WARNING: Some date rounding tests not run since the current version is " + SystemUtils.JAVA_VERSION);
         }
         TimeZone.setDefault(defaultZone);
         dateTimeParser.setTimeZone(defaultZone);
@@ -686,6 +881,85 @@ public class DateUtilsTest extends TestCase {
         endCal.set(Calendar.YEAR, 280000000);
         Calendar cal = DateUtils.truncate(endCal, Calendar.DATE);
         assertEquals(0, cal.get(Calendar.HOUR));
+    }
+
+    /**
+     * Tests for LANG-59
+     *
+     * see http://issues.apache.org/jira/browse/LANG-59
+     */
+    public void testTruncateLang59() throws Exception {
+        if (!SystemUtils.isJavaVersionAtLeast(1.4f)) {
+            this.warn("WARNING: Test for LANG-59 not run since the current version is " + SystemUtils.JAVA_VERSION);
+            return;
+        }
+
+        // Set TimeZone to Mountain Time
+        TimeZone MST_MDT = TimeZone.getTimeZone("MST7MDT");
+        TimeZone.setDefault(MST_MDT);
+        DateFormat format = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS z");
+        format.setTimeZone(MST_MDT);
+
+        Date oct31_01MDT = new Date(1099206000000L); 
+
+        Date oct31MDT             = new Date(oct31_01MDT.getTime()       - 3600000L); // - 1 hour
+        Date oct31_01_02MDT       = new Date(oct31_01MDT.getTime()       + 120000L);  // + 2 minutes
+        Date oct31_01_02_03MDT    = new Date(oct31_01_02MDT.getTime()    + 3000L);    // + 3 seconds
+        Date oct31_01_02_03_04MDT = new Date(oct31_01_02_03MDT.getTime() + 4L);       // + 4 milliseconds
+
+        assertEquals("Check 00:00:00.000", "2004-10-31 00:00:00.000 MDT", format.format(oct31MDT));
+        assertEquals("Check 01:00:00.000", "2004-10-31 01:00:00.000 MDT", format.format(oct31_01MDT));
+        assertEquals("Check 01:02:00.000", "2004-10-31 01:02:00.000 MDT", format.format(oct31_01_02MDT));
+        assertEquals("Check 01:02:03.000", "2004-10-31 01:02:03.000 MDT", format.format(oct31_01_02_03MDT));
+        assertEquals("Check 01:02:03.004", "2004-10-31 01:02:03.004 MDT", format.format(oct31_01_02_03_04MDT));
+
+        // ------- Demonstrate Problem -------
+        Calendar gval = Calendar.getInstance();
+        gval.setTime(new Date(oct31_01MDT.getTime()));
+        gval.set(Calendar.MINUTE, gval.get(Calendar.MINUTE)); // set minutes to the same value
+        assertEquals("Demonstrate Problem", gval.getTime().getTime(), oct31_01MDT.getTime() + 3600000L);
+
+        // ---------- Test Truncate ----------
+        assertEquals("Truncate Calendar.MILLISECOND",
+                oct31_01_02_03_04MDT, DateUtils.truncate(oct31_01_02_03_04MDT, Calendar.MILLISECOND));
+
+        assertEquals("Truncate Calendar.SECOND",
+                   oct31_01_02_03MDT, DateUtils.truncate(oct31_01_02_03_04MDT, Calendar.SECOND));
+
+        assertEquals("Truncate Calendar.MINUTE",
+                      oct31_01_02MDT, DateUtils.truncate(oct31_01_02_03_04MDT, Calendar.MINUTE));
+
+        assertEquals("Truncate Calendar.HOUR_OF_DAY",
+                         oct31_01MDT, DateUtils.truncate(oct31_01_02_03_04MDT, Calendar.HOUR_OF_DAY));
+
+        assertEquals("Truncate Calendar.HOUR",
+                         oct31_01MDT, DateUtils.truncate(oct31_01_02_03_04MDT, Calendar.HOUR));
+
+        assertEquals("Truncate Calendar.DATE",
+                            oct31MDT, DateUtils.truncate(oct31_01_02_03_04MDT, Calendar.DATE));
+
+
+        // ---------- Test Round (down) ----------
+        assertEquals("Round Calendar.MILLISECOND",
+                oct31_01_02_03_04MDT, DateUtils.round(oct31_01_02_03_04MDT, Calendar.MILLISECOND));
+
+        assertEquals("Round Calendar.SECOND",
+                   oct31_01_02_03MDT, DateUtils.round(oct31_01_02_03_04MDT, Calendar.SECOND));
+
+        assertEquals("Round Calendar.MINUTE",
+                      oct31_01_02MDT, DateUtils.round(oct31_01_02_03_04MDT, Calendar.MINUTE));
+
+        assertEquals("Round Calendar.HOUR_OF_DAY",
+                         oct31_01MDT, DateUtils.round(oct31_01_02_03_04MDT, Calendar.HOUR_OF_DAY));
+
+        assertEquals("Round Calendar.HOUR",
+                         oct31_01MDT, DateUtils.round(oct31_01_02_03_04MDT, Calendar.HOUR));
+
+        assertEquals("Round Calendar.DATE",
+                            oct31MDT, DateUtils.round(oct31_01_02_03_04MDT, Calendar.DATE));
+
+        // restore default time zone
+        TimeZone.setDefault(defaultZone);
     }
 
     /**

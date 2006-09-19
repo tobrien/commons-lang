@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -137,6 +138,59 @@ public class MutableLongTest extends TestCase {
         assertEquals( (short) 1, mutNum.shortValue() );
         assertEquals( 1, mutNum.intValue() );
         assertEquals( 1L, mutNum.longValue() );
+    }
+
+    public void testToLong() {
+        assertEquals(new Long(0L), new MutableLong(0L).toLong());
+        assertEquals(new Long(123L), new MutableLong(123L).toLong());
+    }
+
+    public void testIncrement() {
+        MutableLong mutNum = new MutableLong(1);
+        mutNum.increment();
+        
+        assertEquals(2, mutNum.intValue());
+        assertEquals(2L, mutNum.longValue());
+    }
+
+    public void testDecrement() {
+        MutableLong mutNum = new MutableLong(1);
+        mutNum.decrement();
+        
+        assertEquals(0, mutNum.intValue());
+        assertEquals(0L, mutNum.longValue());
+    }
+
+    public void testAddValuePrimitive() {
+        MutableLong mutNum = new MutableLong(1);
+        mutNum.add(1);
+        
+        assertEquals(2, mutNum.intValue());
+        assertEquals(2L, mutNum.longValue());
+    }
+
+    public void testAddValueObject() {
+        MutableLong mutNum = new MutableLong(1);
+        mutNum.add(new Long(1));
+        
+        assertEquals(2, mutNum.intValue());
+        assertEquals(2L, mutNum.longValue());
+    }
+
+    public void testSubtractValuePrimitive() {
+        MutableLong mutNum = new MutableLong(1);
+        mutNum.subtract(1);
+        
+        assertEquals(0, mutNum.intValue());
+        assertEquals(0L, mutNum.longValue());
+    }
+
+    public void testSubtractValueObject() {
+        MutableLong mutNum = new MutableLong(1);
+        mutNum.subtract(new Long(1));
+        
+        assertEquals(0, mutNum.intValue());
+        assertEquals(0L, mutNum.longValue());
     }
 
     public void testToString() {

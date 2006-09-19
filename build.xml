@@ -1,23 +1,28 @@
 <!--
-Copyright 2002-2005 The Apache Software Foundation.
- 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-
-     http://www.apache.org/licenses/LICENSE-2.0
-
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one
+ * or more contributor license agreements.  See the NOTICE file
+ * distributed with this work for additional information
+ * regarding copyright ownership.  The ASF licenses this file
+ * to you under the Apache License, Version 2.0 (the
+ * "License"); you may not use this file except in compliance
+ * with the License.  You may obtain a copy of the License at
+ *
+ * http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing,
+ * software distributed under the License is distributed on an
+ * "AS IS" BASIS, WITHOUT WARRANTIES OR CONDITIONS OF ANY
+ * KIND, either express or implied.  See the License for the
+ * specific language governing permissions and limitations
+ * under the License.
+ */
+ -->
+<!--
+   "Lang" component of the Jakarta Commons Subproject
+   $Id$
 -->
 <project name="Lang" default="compile" basedir=".">
-	<!--
-        "Lang" component of the Jakarta Commons Subproject
-        $Id$
-    -->
 	<!-- ========== Initialize Properties ===================================== -->
 	<property file="${user.home}/${component.name}.build.properties"/>
 	<property file="${user.home}/build.properties"/>
@@ -90,11 +95,6 @@ limitations under the License.
 		<copy file="RELEASE-NOTES.txt" todir="${dist.home}"/>
 		<antcall target="jar"/>
 	</target>
-	<target name="dist-build-2.1" description="Build binary distribution files excluding the text package">
-		<delete dir="src/java/org/apache/commons/lang/text"/>
-		<delete dir="src/test/org/apache/commons/lang/text"/>
-		<antcall target="dist-build"/>
-	</target>
 	<target name="dist-build" depends="clean,dist" description="Build binary distribution files">
 		<mkdir dir="${final.name}"/>
 		<move todir="${final.name}/${final.name}">
@@ -122,8 +122,6 @@ limitations under the License.
 		</copy>
 	</target>
 	<!-- ========== Unit Test Targets ========================================= -->
-	<!-- removed test.text target from the depends list for the 2.1 release. It
-     should be reinstated when the text package is included -->
 	<target name="test" depends="
                                 compile.tests, 
                                 test.lang,
@@ -132,7 +130,8 @@ limitations under the License.
 						        test.enums,
                                 test.exception,
                                 test.math,
-                                test.mutable,
+						        test.mutable,
+        						test.text,
 						        test.time" description="Run all unit test cases">
 		<echo message="Running tests ..."/>
 	</target>
@@ -171,8 +170,5 @@ limitations under the License.
 	</target>
 	<target name="test.time" depends="compile.tests">
 		<runTestCase classname="org.apache.commons.lang.time.TimeTestSuite"/>
-	</target>
-	<target name="test.util" depends="compile.tests">
-		<runTestCase classname="org.apache.commons.lang.util.UtilTestSuite"/>
 	</target>
 </project>

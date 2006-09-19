@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -72,7 +73,7 @@ import org.apache.commons.lang.ClassUtils;
  * <p>The above class could then be used as follows:</p>
  *
  * <pre>
- * public void doSomething(JavaVersion ver) {
+ * public void doSomething(JavaVersionEnum ver) {
  *   switch (ver.getValue()) {
  *     case JAVA1_0_VALUE:
  *       // ...
@@ -103,7 +104,11 @@ import org.apache.commons.lang.ClassUtils;
  */
 public abstract class ValuedEnum extends Enum {
     
-    /** Lang version 1.0.1 serial compatibility */
+    /**
+     * Required for serialization support. Lang version 1.0.1 serial compatibility.
+     * 
+     * @see java.io.Serializable
+     */
     private static final long serialVersionUID = -7129650521543789085L;
     
     /**
@@ -140,9 +145,9 @@ public abstract class ValuedEnum extends Enum {
         }
         List list = Enum.getEnumList(enumClass);
         for (Iterator it = list.iterator(); it.hasNext();) {
-            ValuedEnum enum = (ValuedEnum) it.next();
-            if (enum.getValue() == value) {
-                return enum;
+            ValuedEnum enumeration = (ValuedEnum) it.next();
+            if (enumeration.getValue() == value) {
+                return enumeration;
             }
         }
         return null;

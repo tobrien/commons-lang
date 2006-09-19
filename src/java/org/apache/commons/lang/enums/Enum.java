@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -234,7 +235,11 @@ import org.apache.commons.lang.StringUtils;
  */
 public abstract class Enum implements Comparable, Serializable {
 
-    /** Lang version 1.0.1 serial compatibility */
+    /**
+     * Required for serialization support.
+     * 
+     * @see java.io.Serializable
+     */
     private static final long serialVersionUID = -487045951170455942L;
     
     // After discussion, the default size for HashMaps is used, as the
@@ -289,8 +294,8 @@ public abstract class Enum implements Comparable, Serializable {
         /**
          * <p>Restrictive constructor.</p>
          */
-        private Entry() {
-          ; // empty constructor
+        protected Entry() {
+          super();
         }
     }
 
@@ -365,7 +370,7 @@ public abstract class Enum implements Comparable, Serializable {
         if (entry == null) {
             return null;
         }
-        return (Enum) entry.map.get(getName());
+        return entry.map.get(getName());
     }
     
     //--------------------------------------------------------------------------------
@@ -543,18 +548,7 @@ public abstract class Enum implements Comparable, Serializable {
             if (other.getClass().getName().equals(this.getClass().getName()) == false) {
                 return false;
             }
-            try {
-                Method mth = other.getClass().getMethod("getName", null);
-                String name = (String) mth.invoke(other, null);
-                return iName.equals(name);
-            } catch (NoSuchMethodException e) {
-                // ignore - should never happen
-            } catch (IllegalAccessException e) {
-                // ignore - should never happen
-            } catch (InvocationTargetException e) {
-                // ignore - should never happen
-            }
-            return false;
+            return iName.equals( getNameInOtherClassLoader(other) );
         }
     }
     
@@ -573,6 +567,9 @@ public abstract class Enum implements Comparable, Serializable {
      * <p>The default ordering is alphabetic by name, but this
      * can be overridden by subclasses.</p>
      * 
+     * <p>If the parameter is in a different class loader than this instance,
+     * reflection is used to compare the names.</p>
+     *
      * @see java.lang.Comparable#compareTo(Object)
      * @param other  the other object to compare to
      * @return -ve if this is less than the other object, +ve if greater
@@ -584,7 +581,35 @@ public abstract class Enum implements Comparable, Serializable {
         if (other == this) {
             return 0;
         }
+        if (other.getClass() != this.getClass()) {
+            if (other.getClass().getName().equals(this.getClass().getName())) {
+                return iName.compareTo( getNameInOtherClassLoader(other) );
+            }
+            throw new ClassCastException(
+                    "Different enum class '" + ClassUtils.getShortClassName(other.getClass()) + "'");
+        }
         return iName.compareTo(((Enum) other).iName);
+    }
+
+    /**
+     * <p>Use reflection to return an objects class name.</p>
+     *
+     * @param other The object to determine the class name for
+     * @return The class name
+     */
+    private String getNameInOtherClassLoader(Object other) {
+        try {
+            Method mth = other.getClass().getMethod("getName", null);
+            String name = (String) mth.invoke(other, null);
+            return name;
+        } catch (NoSuchMethodException e) {
+            // ignore - should never happen
+        } catch (IllegalAccessException e) {
+            // ignore - should never happen
+        } catch (InvocationTargetException e) {
+            // ignore - should never happen
+        }
+        throw new IllegalStateException("This should not happen");
     }
 
     /**

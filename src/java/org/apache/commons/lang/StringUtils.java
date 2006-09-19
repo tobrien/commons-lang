@@ -1,9 +1,10 @@
 /*
- * Copyright 2002-2005 The Apache Software Foundation.
- * 
- * Licensed under the Apache License, Version 2.0 (the "License");
- * you may not use this file except in compliance with the License.
- * You may obtain a copy of the License at
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
  * 
  *      http://www.apache.org/licenses/LICENSE-2.0
  * 
@@ -110,6 +111,8 @@ import java.util.List;
  * @author Phil Steitz
  * @author Al Chou
  * @author Michael Davey
+ * @author Reuben Sivan
+ * @author Chris Hyzer
  * @since 1.0
  * @version $Id$
  */
@@ -148,18 +151,6 @@ public class StringUtils {
     private static final int PAD_LIMIT = 8192;
 
     /**
-     * <p>An array of <code>String</code>s used for padding.</p>
-     *
-     * <p>Used for efficient space padding. The length of each String expands as needed.</p>
-     */
-    private static final String[] PADDING = new String[Character.MAX_VALUE];
-
-    static {
-        // space padding is most common, start with 64 chars
-        PADDING[32] = "                                                                ";
-    }
-
-    /**
      * <p><code>StringUtils</code> instances should NOT be constructed in
      * standard programming. Instead, the class should be used as
      * <code>StringUtils.trim(" foo ");</code>.</p>
@@ -168,7 +159,7 @@ public class StringUtils {
      * instance to operate.</p>
      */
     public StringUtils() {
-        // no init.
+        super();
     }
 
     // Empty checks
@@ -210,7 +201,7 @@ public class StringUtils {
      * @return <code>true</code> if the String is not empty and not null
      */
     public static boolean isNotEmpty(String str) {
-        return str != null && str.length() > 0;
+        return !StringUtils.isEmpty(str);
     }
 
     /**
@@ -258,16 +249,7 @@ public class StringUtils {
      * @since 2.0
      */
     public static boolean isNotBlank(String str) {
-        int strLen;
-        if (str == null || (strLen = str.length()) == 0) {
-            return false;
-        }
-        for (int i = 0; i < strLen; i++) {
-            if ((Character.isWhitespace(str.charAt(i)) == false)) {
-                return true;
-            }
-        }
-        return false;
+        return !StringUtils.isBlank(str);
     }
 
     // Trim
@@ -410,14 +392,14 @@ public class StringUtils {
      * Whitespace is defined by {@link Character#isWhitespace(char)}.</p>
      *
      * <pre>
-     * StringUtils.strip(null)     = null
-     * StringUtils.strip("")       = null
-     * StringUtils.strip("   ")    = null
-     * StringUtils.strip("abc")    = "abc"
-     * StringUtils.strip("  abc")  = "abc"
-     * StringUtils.strip("abc  ")  = "abc"
-     * StringUtils.strip(" abc ")  = "abc"
-     * StringUtils.strip(" ab c ") = "ab c"
+     * StringUtils.stripToNull(null)     = null
+     * StringUtils.stripToNull("")       = null
+     * StringUtils.stripToNull("   ")    = null
+     * StringUtils.stripToNull("abc")    = "abc"
+     * StringUtils.stripToNull("  abc")  = "abc"
+     * StringUtils.stripToNull("abc  ")  = "abc"
+     * StringUtils.stripToNull(" abc ")  = "abc"
+     * StringUtils.stripToNull(" ab c ") = "ab c"
      * </pre>
      *
      * @param str  the String to be stripped, may be null
@@ -441,14 +423,14 @@ public class StringUtils {
      * Whitespace is defined by {@link Character#isWhitespace(char)}.</p>
      *
      * <pre>
-     * StringUtils.strip(null)     = ""
-     * StringUtils.strip("")       = ""
-     * StringUtils.strip("   ")    = ""
-     * StringUtils.strip("abc")    = "abc"
-     * StringUtils.strip("  abc")  = "abc"
-     * StringUtils.strip("abc  ")  = "abc"
-     * StringUtils.strip(" abc ")  = "abc"
-     * StringUtils.strip(" ab c ") = "ab c"
+     * StringUtils.stripToEmpty(null)     = ""
+     * StringUtils.stripToEmpty("")       = ""
+     * StringUtils.stripToEmpty("   ")    = ""
+     * StringUtils.stripToEmpty("abc")    = "abc"
+     * StringUtils.stripToEmpty("  abc")  = "abc"
+     * StringUtils.stripToEmpty("abc  ")  = "abc"
+     * StringUtils.stripToEmpty(" abc ")  = "abc"
+     * StringUtils.stripToEmpty(" ab c ") = "ab c"
      * </pre>
      *
      * @param str  the String to be stripped, may be null
@@ -1052,6 +1034,36 @@ public class StringUtils {
         }
         return str.indexOf(searchStr) >= 0;
     }
+
+ /**
+     * <p>Checks if String contains a search String irrespective of case,
+     * handling <code>null</code>. This method uses
+     * {@link #contains(String, String)}.</p>
+     *
+     * <p>A <code>null</code> String will return <code>false</code>.</p>
+     *
+     * <pre>
+     * StringUtils.contains(null, *) = false
+     * StringUtils.contains(*, null) = false
+     * StringUtils.contains("", "") = true
+     * StringUtils.contains("abc", "") = true
+     * StringUtils.contains("abc", "a") = true
+     * StringUtils.contains("abc", "z") = false
+     * StringUtils.contains("abc", "A") = true
+     * StringUtils.contains("abc", "Z") = false
+     * </pre>
+     *
+     * @param str the String to check, may be null
+     * @param searchStr the String to find, may be null
+     * @return true if the String contains the search String irrespective of
+     * case or false if not or <code>null</code> string input
+     */
+    public static boolean containsIgnoreCase(String str, String searchStr) {
+        if (str == null || searchStr == null) {
+            return false;
+        }
+        return contains(str.toUpperCase(), searchStr.toUpperCase());
+    } 
 
     // IndexOfAny chars
     //-----------------------------------------------------------------------
@@ -2070,13 +2082,12 @@ public class StringUtils {
      * A <code>null</code> separator splits on whitespace.</p>
      *
      * <pre>
-     * StringUtils.split(null, *)            = null
-     * StringUtils.split("", *)              = []
-     * StringUtils.split("ab de fg", null)   = ["ab", "de", "fg"]
-     * StringUtils.split("ab   de fg", null) = ["ab", "de", "fg"]
-     * StringUtils.split("ab:cd:ef", ":")    = ["ab", "cd", "ef"]
-     * StringUtils.split("abstemiouslyaeiouyabstemiously", "aeiouy")  = ["bst", "m", "sl", "bst", "m", "sl"]
-     * StringUtils.split("abstemiouslyaeiouyabstemiously", "aeiouy")  = ["abstemiously", "abstemiously"]
+     * StringUtils.splitByWholeSeparator(null, *)               = null
+     * StringUtils.splitByWholeSeparator("", *)                 = []
+     * StringUtils.splitByWholeSeparator("ab de fg", null)      = ["ab", "de", "fg"]
+     * StringUtils.splitByWholeSeparator("ab   de fg", null)    = ["ab", "de", "fg"]
+     * StringUtils.splitByWholeSeparator("ab:cd:ef", ":")       = ["ab", "cd", "ef"]
+     * StringUtils.splitByWholeSeparator("ab-!-cd-!-ef", "-!-") = ["ab", "cd", "ef"]
      * </pre>
      *
      * @param str  the String to parse, may be null
@@ -2103,10 +2114,9 @@ public class StringUtils {
      * StringUtils.splitByWholeSeparator("", *, *)                 = []
      * StringUtils.splitByWholeSeparator("ab de fg", null, 0)      = ["ab", "de", "fg"]
      * StringUtils.splitByWholeSeparator("ab   de fg", null, 0)    = ["ab", "de", "fg"]
-     * StringUtils.splitByWholeSeparator("ab:cd:ef", ":", 2)       = ["ab", "cd"]
-     * StringUtils.splitByWholeSeparator("abstemiouslyaeiouyabstemiously", "aeiouy", 2) = ["bst", "m"]
-     * StringUtils.splitByWholeSeparator("abstemiouslyaeiouyabstemiously", "aeiouy", 2) = 
-     * ["abstemiously", "abstemiously"]
+     * StringUtils.splitByWholeSeparator("ab:cd:ef", ":", 2)       = ["ab", "cd:ef"]
+     * StringUtils.splitByWholeSeparator("ab-!-cd-!-ef", "-!-", 5) = ["ab", "cd", "ef"]
+     * StringUtils.splitByWholeSeparator("ab-!-cd-!-ef", "-!-", 2) = ["ab", "cd-!-ef"]
      * </pre>
      *
      * @param str  the String to parse, may be null
@@ -2218,12 +2228,12 @@ public class StringUtils {
      * StringUtils.splitPreserveAllTokens(null, *)         = null
      * StringUtils.splitPreserveAllTokens("", *)           = []
      * StringUtils.splitPreserveAllTokens("a.b.c", '.')    = ["a", "b", "c"]
-     * StringUtils.splitPreserveAllTokens("a..b.c", '.')   = ["a", "b", "c"]
+     * StringUtils.splitPreserveAllTokens("a..b.c", '.')   = ["a", "", "b", "c"]
      * StringUtils.splitPreserveAllTokens("a:b:c", '.')    = ["a:b:c"]
      * StringUtils.splitPreserveAllTokens("a\tb\nc", null) = ["a", "b", "c"]
      * StringUtils.splitPreserveAllTokens("a b c", ' ')    = ["a", "b", "c"]
      * StringUtils.splitPreserveAllTokens("a b c ", ' ')   = ["a", "b", "c", ""]
-     * StringUtils.splitPreserveAllTokens("a b c ", ' ')   = ["a", "b", "c", "", ""]
+     * StringUtils.splitPreserveAllTokens("a b c  ", ' ')   = ["a", "b", "c", "", ""]
      * StringUtils.splitPreserveAllTokens(" a b c", ' ')   = ["", a", "b", "c"]
      * StringUtils.splitPreserveAllTokens("  a b c", ' ')  = ["", "", a", "b", "c"]
      * StringUtils.splitPreserveAllTokens(" a b c ", ' ')  = ["", a", "b", "c", ""]
@@ -2785,7 +2795,7 @@ public class StringUtils {
      * StringUtils.removeEnd(null, *)      = null
      * StringUtils.removeEnd("", *)        = ""
      * StringUtils.removeEnd(*, null)      = *
-     * StringUtils.removeEnd("www.domain.com", ".com.")  = "www,domain"
+     * StringUtils.removeEnd("www.domain.com", ".com.")  = "www.domain.com."
      * StringUtils.removeEnd("www.domain.com", ".com")   = "www.domain"
      * StringUtils.removeEnd("www.domain.com", "domain") = "www.domain.com"
      * StringUtils.removeEnd("abc", "")    = "abc"
@@ -2955,19 +2965,26 @@ public class StringUtils {
      *  <code>null</code> if null String input
      */
     public static String replace(String text, String repl, String with, int max) {
-        if (text == null || isEmpty(repl) || with == null || max == 0) {
+        if (isEmpty(text) || isEmpty(repl) || with == null || max == 0) {
             return text;
         }
-
-        StringBuffer buf = new StringBuffer(text.length());
-        int start = 0, end = 0;
-        while ((end = text.indexOf(repl, start)) != -1) {
+        int start = 0;
+        int end = text.indexOf(repl, start);
+        if (end == -1) {
+            return text;
+        }
+        int replLength = repl.length();
+        int increase = with.length() - replLength;
+        increase = (increase < 0 ? 0 : increase);
+        increase *= (max < 0 ? 16 : (max > 64 ? 64 : max));
+        StringBuffer buf = new StringBuffer(text.length() + increase);
+        while (end != -1) {
             buf.append(text.substring(start, end)).append(with);
-            start = end + repl.length();
-
+            start = end + replLength;
             if (--max == 0) {
                 break;
             }
+            end = text.indexOf(repl, start);
         }
         buf.append(text.substring(start));
         return buf.toString();
@@ -3046,13 +3063,15 @@ public class StringUtils {
             replaceChars = "";
         }
         boolean modified = false;
-        StringBuffer buf = new StringBuffer(str.length());
-        for (int i = 0; i < str.length(); i++) {
+        int replaceCharsLength = replaceChars.length();
+        int strLength = str.length();
+        StringBuffer buf = new StringBuffer(strLength);
+        for (int i = 0; i < strLength; i++) {
             char ch = str.charAt(i);
             int index = searchChars.indexOf(ch);
             if (index >= 0) {
                 modified = true;
-                if (index < replaceChars.length()) {
+                if (index < replaceCharsLength) {
                     buf.append(replaceChars.charAt(index));
                 }
             } else {
@@ -3196,7 +3215,7 @@ public class StringUtils {
 
         if (str.length() == 1) {
             char ch = str.charAt(0);
-            if (ch == '\r' || ch == '\n') {
+            if (ch == CharUtils.CR || ch == CharUtils.LF) {
                 return EMPTY;
             } else {
                 return str;
@@ -3206,14 +3225,11 @@ public class StringUtils {
         int lastIdx = str.length() - 1;
         char last = str.charAt(lastIdx);
 
-        if (last == '\n') {
-            if (str.charAt(lastIdx - 1) == '\r') {
+        if (last == CharUtils.LF) {
+            if (str.charAt(lastIdx - 1) == CharUtils.CR) {
                 lastIdx--;
             }
-        } else if (last == '\r') {
-            // why is this block empty?
-            // just to skip incrementing the index?
-        } else {
+        } else if (last != CharUtils.CR) {
             lastIdx++;
         }
         return str.substring(0, lastIdx);
@@ -3391,8 +3407,8 @@ public class StringUtils {
         int lastIdx = strLen - 1;
         String ret = str.substring(0, lastIdx);
         char last = str.charAt(lastIdx);
-        if (last == '\n') {
-            if (ret.charAt(lastIdx - 1) == '\r') {
+        if (last == CharUtils.LF) {
+            if (ret.charAt(lastIdx - 1) == CharUtils.CR) {
                 return ret.substring(0, lastIdx - 1);
             }
         }
@@ -3415,8 +3431,8 @@ public class StringUtils {
             return EMPTY;
         }
         char last = str.charAt(lastIdx);
-        if (last == '\n') {
-            if (str.charAt(lastIdx - 1) == '\r') {
+        if (last == CharUtils.LF) {
+            if (str.charAt(lastIdx - 1) == CharUtils.CR) {
                 lastIdx--;
             }
         } else {
@@ -3521,23 +3537,28 @@ public class StringUtils {
      * StringUtils.padding(-2, 'e') = IndexOutOfBoundsException
      * </pre>
      *
+     * <p>Note: this method doesn't not support padding with
+     * <a href="http://www.unicode.org/glossary/#supplementary_character">Unicode Supplementary Characters</a>
+     * as they require a pair of <code>char</code>s to be represented.
+     * If you are needing to support full I18N of your applications
+     * consider using {@link #repeat(String, int)} instead. 
+     * </p>
+     *
      * @param repeat  number of times to repeat delim
      * @param padChar  character to repeat
      * @return String with repeated character
      * @throws IndexOutOfBoundsException if <code>repeat &lt; 0</code>
+     * @see #repeat(String, int)
      */
-    private static String padding(int repeat, char padChar) {
-        // be careful of synchronization in this method
-        // we are assuming that get and set from an array index is atomic
-        String pad = PADDING[padChar];
-        if (pad == null) {
-            pad = String.valueOf(padChar);
+    private static String padding(int repeat, char padChar) throws IndexOutOfBoundsException {
+        if (repeat < 0) {
+            throw new IndexOutOfBoundsException("Cannot pad a negative amount: " + repeat);
         }
-        while (pad.length() < repeat) {
-            pad = pad.concat(pad);
+        final char[] buf = new char[repeat];
+        for (int i = 0; i < buf.length; i++) {
+            buf[i] = padChar;
         }
-        PADDING[padChar] = pad;
-        return pad.substring(0, repeat);
+        return new String(buf);
     }
 
     /**
@@ -4724,8 +4745,13 @@ public class StringUtils {
      * another, where each change is a single character modification (deletion,
      * insertion or substitution).</p>
      *
-     * <p>This implementation of the Levenshtein distance algorithm
-     * is from <a href="http://www.merriampark.com/ld.htm">http://www.merriampark.com/ld.htm</a></p>
+     * <p>The previous implementation of the Levenshtein distance algorithm
+     * was from <a href="http://www.merriampark.com/ld.htm">http://www.merriampark.com/ld.htm</a></p>
+     *
+     * <p>Chas Emerick has written an implementation in Java, which avoids an OutOfMemoryError
+     * which can occur when my Java implementation is used with very large strings.<br>
+     * This implementation of the Levenshtein distance algorithm
+     * is from <a href="http://www.merriampark.com/ldjava.htm">http://www.merriampark.com/ldjava.htm</a></p>
      *
      * <pre>
      * StringUtils.getLevenshteinDistance(null, *)             = IllegalArgumentException
@@ -4750,57 +4776,68 @@ public class StringUtils {
         if (s == null || t == null) {
             throw new IllegalArgumentException("Strings must not be null");
         }
-        int d[][]; // matrix
-        int n; // length of s
-        int m; // length of t
-        int i; // iterates through s
-        int j; // iterates through t
-        char s_i; // ith character of s
-        char t_j; // jth character of t
-        int cost; // cost
 
-        // Step 1
-        n = s.length();
-        m = t.length();
+        /*
+           The difference between this impl. and the previous is that, rather 
+           than creating and retaining a matrix of size s.length()+1 by t.length()+1, 
+           we maintain two single-dimensional arrays of length s.length()+1.  The first, d,
+           is the 'current working' distance array that maintains the newest distance cost
+           counts as we iterate through the characters of String s.  Each time we increment
+           the index of String t we are comparing, d is copied to p, the second int[].  Doing so
+           allows us to retain the previous cost counts as required by the algorithm (taking 
+           the minimum of the cost count to the left, up one, and diagonally up and to the left
+           of the current cost count being calculated).  (Note that the arrays aren't really 
+           copied anymore, just switched...this is clearly much better than cloning an array 
+           or doing a System.arraycopy() each time  through the outer loop.)
+
+           Effectively, the difference between the two implementations is this one does not 
+           cause an out of memory condition when calculating the LD over two very large strings.
+         */
+
+        int n = s.length(); // length of s
+        int m = t.length(); // length of t
+
         if (n == 0) {
             return m;
-        }
-        if (m == 0) {
+        } else if (m == 0) {
             return n;
         }
-        d = new int[n + 1][m + 1];
 
-        // Step 2
-        for (i = 0; i <= n; i++) {
-            d[i][0] = i;
+        int p[] = new int[n+1]; //'previous' cost array, horizontally
+        int d[] = new int[n+1]; // cost array, horizontally
+        int _d[]; //placeholder to assist in swapping p and d
+
+        // indexes into strings s and t
+        int i; // iterates through s
+        int j; // iterates through t
+
+        char t_j; // jth character of t
+
+        int cost; // cost
+
+        for (i = 0; i<=n; i++) {
+            p[i] = i;
         }
 
-        for (j = 0; j <= m; j++) {
-            d[0][j] = j;
-        }
+        for (j = 1; j<=m; j++) {
+            t_j = t.charAt(j-1);
+            d[0] = j;
 
-        // Step 3
-        for (i = 1; i <= n; i++) {
-            s_i = s.charAt(i - 1);
-
-            // Step 4
-            for (j = 1; j <= m; j++) {
-                t_j = t.charAt(j - 1);
-
-                // Step 5
-                if (s_i == t_j) {
-                    cost = 0;
-                } else {
-                    cost = 1;
-                }
-
-                // Step 6
-                d[i][j] = min(d[i - 1][j] + 1, d[i][j - 1] + 1, d[i - 1][j - 1] + cost);
+            for (i=1; i<=n; i++) {
+                cost = s.charAt(i-1)==t_j ? 0 : 1;
+                // minimum of cell to the left+1, to the top+1, diagonally left and up +cost
+                d[i] = Math.min(Math.min(d[i-1]+1, p[i]+1),  p[i-1]+cost);  
             }
+
+            // copy current distance counts to 'previous row' distance counts
+            _d = p;
+            p = d;
+            d = _d;
         }
 
-        // Step 7
-        return d[n][m];
+        // our last action in the above loop was to switch d and p, so p now 
+        // actually has the most recent cost counts
+        return p[n];
     }
 
     /**
@@ -4811,6 +4848,7 @@ public class StringUtils {
      * @param c  value 3
      * @return  the smallest of the values
      */
+/*
     private static int min(int a, int b, int c) {
         // Method copied from NumberUtils to avoid dependency on subpackage
         if (b < a) {
@@ -4821,5 +4859,6 @@ public class StringUtils {
         }
         return a;
     }
+*/
 
 }
