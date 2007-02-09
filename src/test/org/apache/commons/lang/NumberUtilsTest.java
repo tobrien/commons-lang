@@ -1,72 +1,37 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.lang;
 
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- */
-
-import java.lang.reflect.Method;
 import java.math.BigDecimal;
 import java.math.BigInteger;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
+
 /**
  * Unit tests {@link org.apache.commons.lang.NumberUtils}.
  *
  * @author <a href="mailto:rand_mcneely@yahoo.com">Rand McNeely</a>
  * @author <a href="mailto:ridesmet@users.sourceforge.net">Ringo De Smet</a>
- * @version $Id: NumberUtilsTest.java,v 1.2 2002/09/15 10:27:56 scolebourne Exp $
+ * @author Eric Pugh
+ * @author Phil Steitz
+ * @author Stephen Colebourne
+ * @version $Id$
  */
 public class NumberUtilsTest extends TestCase {
 
@@ -105,16 +70,22 @@ public class NumberUtilsTest extends TestCase {
         assertEquals("createNumber(String) 3 failed", new Double("1234.5"), NumberUtils.createNumber("1234.5D"));
         assertEquals("createNumber(String) 4 failed", new Float("1234.5"), NumberUtils.createNumber("1234.5F"));
         assertEquals("createNumber(String) 5 failed", new Long(Integer.MAX_VALUE + 1L), NumberUtils.createNumber("" + (Integer.MAX_VALUE + 1L)));
-        assertEquals("createNumber(String) 6 failed", new Long(12345), NumberUtils.createNumber("12345L"));
-        assertEquals("createNumber(String) 7 failed", new Float("-1234.5"), NumberUtils.createNumber("-1234.5"));
-        assertEquals("createNumber(String) 8 failed", new Integer("-12345"), NumberUtils.createNumber("-12345"));
-        assertTrue("createNumber(String) 9 failed", 0xFADE == NumberUtils.createNumber("0xFADE").intValue());
-        assertTrue("createNumber(String) 10 failed", -0xFADE == NumberUtils.createNumber("-0xFADE").intValue());
-        assertEquals("createNumber(String) 11 failed", new Double("1.1E200"), NumberUtils.createNumber("1.1E200"));
-        assertEquals("createNumber(String) 12 failed", new Float("1.1E20"), NumberUtils.createNumber("1.1E20"));
-        assertEquals("createNumber(String) 13 failed", new Double("-1.1E200"), NumberUtils.createNumber("-1.1E200"));
-        assertEquals("createNumber(String) 14 failed", new Double("1.1E-200"), NumberUtils.createNumber("1.1E-200"));
-        assertEquals("createNumber(String) 15 failed", new BigDecimal("1.1E-700"), NumberUtils.createNumber("1.1E-700F"));
+        assertEquals("createNumber(String) 6 failed", new BigInteger(Long.MAX_VALUE + "0"), NumberUtils.createNumber(Long.MAX_VALUE + "0L"));
+        assertEquals("createNumber(String) 7 failed", new Long(12345), NumberUtils.createNumber("12345L"));
+        assertEquals("createNumber(String) 8 failed", new Float("-1234.5"), NumberUtils.createNumber("-1234.5"));
+        assertEquals("createNumber(String) 9 failed", new Integer("-12345"), NumberUtils.createNumber("-12345"));
+        assertTrue("createNumber(String) 10 failed", 0xFADE == NumberUtils.createNumber("0xFADE").intValue());
+        assertTrue("createNumber(String) 11 failed", -0xFADE == NumberUtils.createNumber("-0xFADE").intValue());
+        assertEquals("createNumber(String) 12 failed", new Double("1.1E200"), NumberUtils.createNumber("1.1E200"));
+        assertEquals("createNumber(String) 13 failed", new Float("1.1E20"), NumberUtils.createNumber("1.1E20"));
+        assertEquals("createNumber(String) 14 failed", new Double("-1.1E200"), NumberUtils.createNumber("-1.1E200"));
+        assertEquals("createNumber(String) 15 failed", new Double("1.1E-200"), NumberUtils.createNumber("1.1E-200"));
+        assertEquals("createNumber(String) 16 failed", new Double("1.1E-200"), NumberUtils.createNumber("1.1E-200"));
+
+        // jdk 1.2 doesn't support this. unsure about jdk 1.2.2
+        if(SystemUtils.isJavaVersionAtLeast(1.3f)) { 
+            assertEquals("createNumber(String) 15 failed", new BigDecimal("1.1E-700"), NumberUtils.createNumber("1.1E-700F"));
+        }
         assertEquals(
             "createNumber(String) 16 failed",
             new Long("10" + Integer.MAX_VALUE),
@@ -490,13 +461,48 @@ public class NumberUtilsTest extends TestCase {
         val = "1234E5l";
         assertTrue("isNumber(String) 14 Neg failed", !NumberUtils.isNumber(val));
         assertTrue("isNumber(String)/createNumber(String) 14 Neg failed", !checkCreateNumber(val));
+        val = "11a";
+        assertTrue("isNumber(String) 15 Neg failed", !NumberUtils.isNumber(val));
+        assertTrue("isNumber(String)/createNumber(String) 15 Neg failed", !checkCreateNumber(val)); 
+        val = "1a";
+        assertTrue("isNumber(String) 16 Neg failed", !NumberUtils.isNumber(val));
+        assertTrue("isNumber(String)/createNumber(String) 16 Neg failed", !checkCreateNumber(val)); 
+        val = "a";
+        assertTrue("isNumber(String) 17 Neg failed", !NumberUtils.isNumber(val));
+        assertTrue("isNumber(String)/createNumber(String) 17 Neg failed", !checkCreateNumber(val)); 
+        val = "11g";
+        assertTrue("isNumber(String) 18 Neg failed", !NumberUtils.isNumber(val));
+        assertTrue("isNumber(String)/createNumber(String) 18 Neg failed", !checkCreateNumber(val)); 
+        val = "11z";
+        assertTrue("isNumber(String) 19 Neg failed", !NumberUtils.isNumber(val));
+        assertTrue("isNumber(String)/createNumber(String) 19 Neg failed", !checkCreateNumber(val)); 
+        val = "11def";
+        assertTrue("isNumber(String) 20 Neg failed", !NumberUtils.isNumber(val));
+        assertTrue("isNumber(String)/createNumber(String) 20 Neg failed", !checkCreateNumber(val)); 
+        val = "11d11";
+        assertTrue("isNumber(String) 21 Neg failed", !NumberUtils.isNumber(val));
+        assertTrue("isNumber(String)/createNumber(String) 21 Neg failed", !checkCreateNumber(val)); 
+
+    }
+    
+    public void testIsNumberInvalidInput() {
+        String val = "0x";
+        assertEquals("isNumber() with 0x wasn't false",  false, NumberUtils.isNumber(val));
+        val = "0x3x3";
+        assertEquals("isNumber() with 0x3x3 wasn't false",  false, NumberUtils.isNumber(val));
+        val = "20EE-3";
+        assertEquals("isNumber() with 20EE-3 wasn't false",  false, NumberUtils.isNumber(val));
+        val = "2435q";
+        assertEquals("isNumber() with 2435q wasn't false",  false, NumberUtils.isNumber(val));
+        val = ".";
+        assertEquals("isNumber() with . wasn't false",  false, NumberUtils.isNumber(val));
 
     }
 
     private boolean checkCreateNumber(String val) {
         try {
             Object obj = NumberUtils.createNumber(val);
-            if(obj == null) {
+            if (obj == null) {
                 return false;
             }
             return true;
@@ -507,4 +513,12 @@ public class NumberUtilsTest extends TestCase {
         }
     }
 
+    public void testPublicNoArgConstructor() {
+        try {
+            NumberUtils nu = new NumberUtils();
+        } catch( Exception e ) {
+            fail( "Error calling public no-arg constructor" );
+        }
+    }
+    
 }

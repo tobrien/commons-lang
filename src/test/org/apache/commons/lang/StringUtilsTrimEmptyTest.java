@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
 
@@ -63,7 +26,7 @@ import junit.textui.TestRunner;
  *
  * @author <a href="mailto:scolebourne@joda.org">Stephen Colebourne</a>
  * @author <a href="mailto:ridesmet@users.sourceforge.net">Ringo De Smet</a>
- * @version $Id: StringUtilsTrimEmptyTest.java,v 1.5 2002/09/27 06:08:16 bayard Exp $
+ * @version $Id$
  */
 public class StringUtilsTrimEmptyTest extends TestCase {
     private static final String FOO = "foo";
@@ -77,8 +40,8 @@ public class StringUtilsTrimEmptyTest extends TestCase {
     }
 
     public static Test suite() {
-    	TestSuite suite = new TestSuite(StringUtilsTrimEmptyTest.class);
-    	suite.setName("StringUtilsTrimEmpty Tests");
+        TestSuite suite = new TestSuite(StringUtilsTrimEmptyTest.class);
+        suite.setName("StringUtilsTrimEmpty Tests");
         return suite;
     }
 
@@ -91,12 +54,46 @@ public class StringUtilsTrimEmptyTest extends TestCase {
     }
 
     //-----------------------------------------------------------------------
+    public void testIsEmpty() {
+        assertEquals(true, StringUtils.isEmpty(null));
+        assertEquals(true, StringUtils.isEmpty(""));
+        assertEquals(false, StringUtils.isEmpty(" "));
+        assertEquals(false, StringUtils.isEmpty("foo"));
+        assertEquals(false, StringUtils.isEmpty("  foo  "));
+    }
 
+    public void testIsNotEmpty() {
+        assertEquals(false, StringUtils.isNotEmpty(null));
+        assertEquals(false, StringUtils.isNotEmpty(""));
+        assertEquals(true, StringUtils.isNotEmpty(" "));
+        assertEquals(true, StringUtils.isNotEmpty("foo"));
+        assertEquals(true, StringUtils.isNotEmpty("  foo  "));
+    }
+
+    public void testIsBlank() {
+        assertEquals(true, StringUtils.isBlank(null));
+        assertEquals(true, StringUtils.isBlank(""));
+        assertEquals(true, StringUtils.isBlank(StringUtilsTest.WHITESPACE));
+        assertEquals(false, StringUtils.isBlank("foo"));
+        assertEquals(false, StringUtils.isBlank("  foo  "));
+    }
+
+    public void testIsNotBlank() {
+        assertEquals(false, StringUtils.isNotBlank(null));
+        assertEquals(false, StringUtils.isNotBlank(""));
+        assertEquals(false, StringUtils.isNotBlank(StringUtilsTest.WHITESPACE));
+        assertEquals(true, StringUtils.isNotBlank("foo"));
+        assertEquals(true, StringUtils.isNotBlank("  foo  "));
+    }
+
+    //-----------------------------------------------------------------------
     public void testClean() {
         assertEquals(FOO, StringUtils.clean(FOO + "  "));
         assertEquals(FOO, StringUtils.clean(" " + FOO + "  "));
         assertEquals(FOO, StringUtils.clean(" " + FOO));
         assertEquals(FOO, StringUtils.clean(FOO + ""));
+        assertEquals("", StringUtils.clean(" \t\r\n\b "));
+        assertEquals("", StringUtils.clean(""));
         assertEquals("", StringUtils.clean(null));
     }
 
@@ -105,94 +102,173 @@ public class StringUtilsTrimEmptyTest extends TestCase {
         assertEquals(FOO, StringUtils.trim(" " + FOO + "  "));
         assertEquals(FOO, StringUtils.trim(" " + FOO));
         assertEquals(FOO, StringUtils.trim(FOO + ""));
+        assertEquals("", StringUtils.trim(" \t\r\n\b "));
+        assertEquals("", StringUtils.trim(StringUtilsTest.TRIMMABLE));
+        assertEquals(StringUtilsTest.NON_TRIMMABLE, StringUtils.trim(StringUtilsTest.NON_TRIMMABLE));
+        assertEquals("", StringUtils.trim(""));
         assertEquals(null, StringUtils.trim(null));
     }
 
-    public void testIsNotEmpty() {
-        assertEquals(true, StringUtils.isNotEmpty(FOO));
-        assertEquals(true, StringUtils.isNotEmpty(" "));
-        assertEquals(false, StringUtils.isNotEmpty(""));
-        assertEquals(false, StringUtils.isNotEmpty(null));
+    public void testTrimToNull() {
+        assertEquals(FOO, StringUtils.trimToNull(FOO + "  "));
+        assertEquals(FOO, StringUtils.trimToNull(" " + FOO + "  "));
+        assertEquals(FOO, StringUtils.trimToNull(" " + FOO));
+        assertEquals(FOO, StringUtils.trimToNull(FOO + ""));
+        assertEquals(null, StringUtils.trimToNull(" \t\r\n\b "));
+        assertEquals(null, StringUtils.trimToNull(StringUtilsTest.TRIMMABLE));
+        assertEquals(StringUtilsTest.NON_TRIMMABLE, StringUtils.trimToNull(StringUtilsTest.NON_TRIMMABLE));
+        assertEquals(null, StringUtils.trimToNull(""));
+        assertEquals(null, StringUtils.trimToNull(null));
     }
 
-    public void testIsEmpty() {
-        assertEquals(false, StringUtils.isEmpty(FOO));
-        assertEquals(true, StringUtils.isEmpty(" "));
-        assertEquals(true, StringUtils.isEmpty(""));
-        assertEquals(true, StringUtils.isEmpty(null));
+    public void testTrimToEmpty() {
+        assertEquals(FOO, StringUtils.trimToEmpty(FOO + "  "));
+        assertEquals(FOO, StringUtils.trimToEmpty(" " + FOO + "  "));
+        assertEquals(FOO, StringUtils.trimToEmpty(" " + FOO));
+        assertEquals(FOO, StringUtils.trimToEmpty(FOO + ""));
+        assertEquals("", StringUtils.trimToEmpty(" \t\r\n\b "));
+        assertEquals("", StringUtils.trimToEmpty(StringUtilsTest.TRIMMABLE));
+        assertEquals(StringUtilsTest.NON_TRIMMABLE, StringUtils.trimToEmpty(StringUtilsTest.NON_TRIMMABLE));
+        assertEquals("", StringUtils.trimToEmpty(""));
+        assertEquals("", StringUtils.trimToEmpty(null));
     }
 
-    public void testDeleteSpace() {
-        assertEquals("deleteWhitespace(String) failed",
-                     "", StringUtils.deleteWhitespace(""));
-        assertEquals("deleteWhitespace(String) failed",
-                     "", StringUtils.deleteWhitespace("  \u000C  \t\t\u001F\n\n \u000B  "));
-        // Note: u-2007 and u-000A both cause problems in the source code
-        // it should ignore 2007 but delete 000A
-        assertEquals("deleteWhitespace(String) failed",
-                     "\u00A0\u202F", StringUtils.deleteWhitespace("  \u00A0  \t\t\n\n \u202F  "));
-        assertEquals("deleteWhitespace(String) failed",
-                     "\u00A0\u202F", StringUtils.deleteWhitespace("\u00A0\u202F"));
-        assertEquals("deleteWhitespace(String) failed",
-                     "test", StringUtils.deleteWhitespace("\u000Bt  \t\n\u0009e\rs\n\n   \tt"));
-
-        assertEquals("deleteSpaces(String) failed",
-                     "", StringUtils.deleteSpaces(""));
-        assertEquals("deleteSpaces(String) failed",
-                     "", StringUtils.deleteSpaces("    \t\t\n\n   "));
-        assertEquals("deleteSpaces(String) failed",
-                     "test", StringUtils.deleteSpaces("t  \t\ne\rs\n\n   \tt"));
-    }
-
-    public void testStrip() {
-        // it's important that foo2Space is fooLeftSpace and fooRightSpace 
-        // merged together. So same number of spaces to left as fLS and same 
-        // to right as fLS. Same applies for foo2Dots.
-        String foo2Space = "    "+FOO+"    ";
-        String foo2Dots = "......"+FOO+".........";
-        String fooLeftSpace = "    "+FOO;
-        String fooLeftDots = "......"+FOO;
-        String fooRightSpace = FOO+"    ";
-        String fooRightDots = FOO+".........";
-
+    //-----------------------------------------------------------------------
+    public void testStrip_String() {
+        assertEquals(null, StringUtils.strip(null));
         assertEquals("", StringUtils.strip(""));
         assertEquals("", StringUtils.strip("        "));
-        assertEquals(FOO, StringUtils.strip(foo2Space));
-        assertEquals(FOO, StringUtils.strip(foo2Dots, "."));
-        assertEquals(FOO, StringUtils.strip(fooRightSpace));
-        assertEquals(FOO, StringUtils.strip(fooRightDots, "."));
-        assertEquals(FOO, StringUtils.strip(fooLeftSpace));
-        assertEquals(FOO, StringUtils.strip(fooLeftDots, "."));
+        assertEquals("abc", StringUtils.strip("  abc  "));
+        assertEquals(StringUtilsTest.NON_WHITESPACE, 
+            StringUtils.strip(StringUtilsTest.WHITESPACE + StringUtilsTest.NON_WHITESPACE + StringUtilsTest.WHITESPACE));
+    }
+    
+    public void testStripToNull_String() {
+        assertEquals(null, StringUtils.stripToNull(null));
+        assertEquals(null, StringUtils.stripToNull(""));
+        assertEquals(null, StringUtils.stripToNull("        "));
+        assertEquals(null, StringUtils.stripToNull(StringUtilsTest.WHITESPACE));
+        assertEquals("ab c", StringUtils.stripToNull("  ab c  "));
+        assertEquals(StringUtilsTest.NON_WHITESPACE, 
+            StringUtils.stripToNull(StringUtilsTest.WHITESPACE + StringUtilsTest.NON_WHITESPACE + StringUtilsTest.WHITESPACE));
+    }
+    
+    public void testStripToEmpty_String() {
+        assertEquals("", StringUtils.stripToEmpty(null));
+        assertEquals("", StringUtils.stripToEmpty(""));
+        assertEquals("", StringUtils.stripToEmpty("        "));
+        assertEquals("", StringUtils.stripToEmpty(StringUtilsTest.WHITESPACE));
+        assertEquals("ab c", StringUtils.stripToEmpty("  ab c  "));
+        assertEquals(StringUtilsTest.NON_WHITESPACE, 
+            StringUtils.stripToEmpty(StringUtilsTest.WHITESPACE + StringUtilsTest.NON_WHITESPACE + StringUtilsTest.WHITESPACE));
+    }
+    
+    public void testStrip_StringString() {
+        // null strip
+        assertEquals(null, StringUtils.strip(null, null));
+        assertEquals("", StringUtils.strip("", null));
+        assertEquals("", StringUtils.strip("        ", null));
+        assertEquals("abc", StringUtils.strip("  abc  ", null));
+        assertEquals(StringUtilsTest.NON_WHITESPACE, 
+            StringUtils.strip(StringUtilsTest.WHITESPACE + StringUtilsTest.NON_WHITESPACE + StringUtilsTest.WHITESPACE, null));
 
+        // "" strip
+        assertEquals(null, StringUtils.strip(null, ""));
+        assertEquals("", StringUtils.strip("", ""));
+        assertEquals("        ", StringUtils.strip("        ", ""));
+        assertEquals("  abc  ", StringUtils.strip("  abc  ", ""));
+        assertEquals(StringUtilsTest.WHITESPACE, StringUtils.strip(StringUtilsTest.WHITESPACE, ""));
+        
+        // " " strip
+        assertEquals(null, StringUtils.strip(null, " "));
+        assertEquals("", StringUtils.strip("", " "));
+        assertEquals("", StringUtils.strip("        ", " "));
+        assertEquals("abc", StringUtils.strip("  abc  ", " "));
+        
+        // "ab" strip
+        assertEquals(null, StringUtils.strip(null, "ab"));
+        assertEquals("", StringUtils.strip("", "ab"));
+        assertEquals("        ", StringUtils.strip("        ", "ab"));
+        assertEquals("  abc  ", StringUtils.strip("  abc  ", "ab"));
+        assertEquals("c", StringUtils.strip("abcabab", "ab"));
+        assertEquals(StringUtilsTest.WHITESPACE, StringUtils.strip(StringUtilsTest.WHITESPACE, ""));
+    }
+    
+    public void testStripStart_StringString() {
+        // null stripStart
+        assertEquals(null, StringUtils.stripStart(null, null));
+        assertEquals("", StringUtils.stripStart("", null));
+        assertEquals("", StringUtils.stripStart("        ", null));
+        assertEquals("abc  ", StringUtils.stripStart("  abc  ", null));
+        assertEquals(StringUtilsTest.NON_WHITESPACE + StringUtilsTest.WHITESPACE, 
+            StringUtils.stripStart(StringUtilsTest.WHITESPACE + StringUtilsTest.NON_WHITESPACE + StringUtilsTest.WHITESPACE, null));
+
+        // "" stripStart
+        assertEquals(null, StringUtils.stripStart(null, ""));
+        assertEquals("", StringUtils.stripStart("", ""));
+        assertEquals("        ", StringUtils.stripStart("        ", ""));
+        assertEquals("  abc  ", StringUtils.stripStart("  abc  ", ""));
+        assertEquals(StringUtilsTest.WHITESPACE, StringUtils.stripStart(StringUtilsTest.WHITESPACE, ""));
+        
+        // " " stripStart
+        assertEquals(null, StringUtils.stripStart(null, " "));
         assertEquals("", StringUtils.stripStart("", " "));
-        assertEquals(fooRightSpace, StringUtils.stripStart(foo2Space, " "));
-        assertEquals(fooRightDots, StringUtils.stripStart(foo2Dots, "."));
-        assertEquals(fooRightSpace, StringUtils.stripStart(fooRightSpace, " "));
-        assertEquals(fooRightDots, StringUtils.stripStart(fooRightDots, "."));
-        assertEquals(FOO, StringUtils.stripStart(fooLeftSpace, " "));
-        assertEquals(FOO, StringUtils.stripStart(fooLeftDots, "."));
+        assertEquals("", StringUtils.stripStart("        ", " "));
+        assertEquals("abc  ", StringUtils.stripStart("  abc  ", " "));
+        
+        // "ab" stripStart
+        assertEquals(null, StringUtils.stripStart(null, "ab"));
+        assertEquals("", StringUtils.stripStart("", "ab"));
+        assertEquals("        ", StringUtils.stripStart("        ", "ab"));
+        assertEquals("  abc  ", StringUtils.stripStart("  abc  ", "ab"));
+        assertEquals("cabab", StringUtils.stripStart("abcabab", "ab"));
+        assertEquals(StringUtilsTest.WHITESPACE, StringUtils.stripStart(StringUtilsTest.WHITESPACE, ""));
+    }
+    
+    public void testStripEnd_StringString() {
+        // null stripEnd
+        assertEquals(null, StringUtils.stripEnd(null, null));
+        assertEquals("", StringUtils.stripEnd("", null));
+        assertEquals("", StringUtils.stripEnd("        ", null));
+        assertEquals("  abc", StringUtils.stripEnd("  abc  ", null));
+        assertEquals(StringUtilsTest.WHITESPACE + StringUtilsTest.NON_WHITESPACE, 
+            StringUtils.stripEnd(StringUtilsTest.WHITESPACE + StringUtilsTest.NON_WHITESPACE + StringUtilsTest.WHITESPACE, null));
 
+        // "" stripEnd
+        assertEquals(null, StringUtils.stripEnd(null, ""));
+        assertEquals("", StringUtils.stripEnd("", ""));
+        assertEquals("        ", StringUtils.stripEnd("        ", ""));
+        assertEquals("  abc  ", StringUtils.stripEnd("  abc  ", ""));
+        assertEquals(StringUtilsTest.WHITESPACE, StringUtils.stripEnd(StringUtilsTest.WHITESPACE, ""));
+        
+        // " " stripEnd
+        assertEquals(null, StringUtils.stripEnd(null, " "));
         assertEquals("", StringUtils.stripEnd("", " "));
-        assertEquals(fooLeftSpace, StringUtils.stripEnd(foo2Space, " "));
-        assertEquals(fooLeftDots, StringUtils.stripEnd(foo2Dots, "."));
-        assertEquals(FOO, StringUtils.stripEnd(fooRightSpace, " "));
-        assertEquals(FOO, StringUtils.stripEnd(fooRightDots, "."));
-        assertEquals(fooLeftSpace, StringUtils.stripEnd(fooLeftSpace, " "));
-        assertEquals(fooLeftDots, StringUtils.stripEnd(fooLeftDots, "."));
+        assertEquals("", StringUtils.stripEnd("        ", " "));
+        assertEquals("  abc", StringUtils.stripEnd("  abc  ", " "));
+        
+        // "ab" stripEnd
+        assertEquals(null, StringUtils.stripEnd(null, "ab"));
+        assertEquals("", StringUtils.stripEnd("", "ab"));
+        assertEquals("        ", StringUtils.stripEnd("        ", "ab"));
+        assertEquals("  abc  ", StringUtils.stripEnd("  abc  ", "ab"));
+        assertEquals("abc", StringUtils.stripEnd("abcabab", "ab"));
+        assertEquals(StringUtilsTest.WHITESPACE, StringUtils.stripEnd(StringUtilsTest.WHITESPACE, ""));
+    }
 
-        assertEquals(FOO, StringUtils.strip(". . . . ."+FOO+". . ", " ."));
-        assertEquals("-."+FOO, StringUtils.strip(". . . . -."+FOO+". . ", " ."));
-        assertEquals(FOO, StringUtils.strip("..  .."+FOO+".. ", " ."));
-        assertEquals(FOO, StringUtils.strip("..  .."+FOO+".. ", "+= ."));
-
+    public void testStripAll() {
         // test stripAll method, merely an array version of the above strip
         String[] empty = new String[0];
-        String[] fooSpace = new String[] { foo2Space, fooLeftSpace, fooRightSpace };
-        String[] fooDots = new String[] { foo2Dots, fooLeftDots, fooRightDots };
+        String[] fooSpace = new String[] { "  "+FOO+"  ", "  "+FOO, FOO+"  " };
+        String[] fooDots = new String[] { ".."+FOO+"..", ".."+FOO, FOO+".." };
         String[] foo = new String[] { FOO, FOO, FOO };
 
+        assertEquals(null, StringUtils.stripAll(null));
         assertArrayEquals(empty, StringUtils.stripAll(empty));
         assertArrayEquals(foo, StringUtils.stripAll(fooSpace));
+        
+        assertEquals(null, StringUtils.stripAll(null, null));
+        assertArrayEquals(foo, StringUtils.stripAll(fooSpace, null));
         assertArrayEquals(foo, StringUtils.stripAll(fooDots, "."));
     }
 

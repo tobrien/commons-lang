@@ -1,71 +1,39 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang.enum;
 
 import java.util.Iterator;
 import java.util.List;
+
+import org.apache.commons.lang.ClassUtils;
+
 /**
- * Abstract superclass for type-safe enums with integer values.
- * <p>
- * <em>NOTE:</em>Due to the way in which Java ClassLoaders work, comparing Enum objects
- * should always be done using the equals() method, not ==. The equals() method will
- * try == first so in most cases the effect is the same.
- * <p>
- * To use this class, it must be subclassed. For example:
+ * <p>Abstract superclass for type-safe enums with integer values suitable
+ * for use in <code>switch</code> statements.</p>
+ *
+ * <p><em>NOTE:</em>Due to the way in which Java ClassLoaders work, comparing
+ * <code>Enum</code> objects should always be done using the equals() method,
+ * not <code>==</code>. The equals() method will try <code>==</code> first so
+ * in most cases the effect is the same.</p>
+ *
+ * <p>To use this class, it must be subclassed. For example:</p>
  *
  * <pre>
- * public final class JavaVersion extends ValuedEnum {
+ * public final class JavaVersionEnum extends ValuedEnum {
  *   //standard enums for version of JVM
  *   public static final int  JAVA1_0_VALUE  = 100;
  *   public static final int  JAVA1_1_VALUE  = 110;
@@ -102,9 +70,10 @@ import java.util.List;
  * }
  * </pre>
  *
- * The above class could then be used as follows:
+ * <p>The above class could then be used as follows:</p>
+ *
  * <pre>
- * public void doSomething(JavaVersion ver) {
+ * public void doSomething(JavaVersionEnum ver) {
  *   switch (ver.getValue()) {
  *     case JAVA1_0_VALUE:
  *       // ...
@@ -116,21 +85,32 @@ import java.util.List;
  *   }
  * }
  * </pre>
- * <p>
- * As shown, each enum has a name and a value. These can be accessed using 
- * <code>getName</code> and <code>getValue</code>.
- * <p>
- * The <code>getEnum</code> and <code>iterator</code> methods are recommended.
- * Unfortunately, Java restrictions require these to be coded as shown in each subclass.
- * An alternative choice is to use the {@link EnumUtils} class.
- * <p>
- * <em>NOTE:</em> This class originated in the Jakarta Avalon project.
- * </p>
  *
- * @author <a href="mailto:scolebourne@joda.org">Stephen Colebourne</a>
- * @version $Id: ValuedEnum.java,v 1.1 2002/08/11 23:17:54 scolebourne Exp $
+ * <p>As shown, each enum has a name and a value. These can be accessed using
+ * <code>getName</code> and <code>getValue</code>.</p>
+ *
+ * <p>The <code>getEnum</code> and <code>iterator</code> methods are recommended.
+ * Unfortunately, Java restrictions require these to be coded as shown in each subclass.
+ * An alternative choice is to use the {@link EnumUtils} class.</p>
+ *
+ * @deprecated Replaced by {@link org.apache.commons.lang.enums.ValuedEnum org.apache.commons.lang.enums.ValuedEnum}
+ *          and will be removed in version 3.0. All classes in this package are deprecated and repackaged to 
+ *          {@link org.apache.commons.lang.enums} since <code>enum</code> is a Java 1.5 keyword. 
+ * @see org.apache.commons.lang.enums.ValuedEnum
+ * @author Apache Avalon project
+ * @author Stephen Colebourne
+ * @since 1.0
+ * @version $Id$
  */
 public abstract class ValuedEnum extends Enum {
+    
+    /**
+     * Required for serialization support. Lang version 1.0.1 serial compatibility.
+     * 
+     * @see java.io.Serializable
+     */
+    private static final long serialVersionUID = -7129650521543789085L;
+    
     /**
      * The value contained in enum.
      */
@@ -139,8 +119,8 @@ public abstract class ValuedEnum extends Enum {
     /**
      * Constructor for enum item.
      *
-     * @param name the name of enum item.
-     * @param value the value of enum item.
+     * @param name  the name of enum item
+     * @param value  the value of enum item
      */
     protected ValuedEnum(String name, int value) {
         super(name);
@@ -148,14 +128,16 @@ public abstract class ValuedEnum extends Enum {
     }
 
     /**
-     * Gets an Enum object by class and value.
-     * This method loops through the list of Enums, thus if there
-     * are many Enums this will be slow.
+     * <p>Gets an <code>Enum</code> object by class and value.</p>
+     *
+     * <p>This method loops through the list of <code>Enum</code>,
+     * thus if there are many <code>Enum</code>s this will be
+     * slow.</p>
      * 
-     * @param enumClass  the class of the Enum to get
-     * @param value  the value of the Enum to get
+     * @param enumClass  the class of the <code>Enum</code> to get
+     * @param value  the value of the <code>Enum</code> to get
      * @return the enum object, or null if the enum does not exist
-     * @throws IllegalArgumentException if the enum class is null
+     * @throws IllegalArgumentException if the enum class is <code>null</code>
      */
     protected static Enum getEnum(Class enumClass, int value) {
         if (enumClass == null) {
@@ -163,16 +145,16 @@ public abstract class ValuedEnum extends Enum {
         }
         List list = Enum.getEnumList(enumClass);
         for (Iterator it = list.iterator(); it.hasNext();) {
-            ValuedEnum enum = (ValuedEnum) it.next();
-            if (enum.getValue() == value) {
-                return enum;
+            ValuedEnum enumeration = (ValuedEnum) it.next();
+            if (enumeration.getValue() == value) {
+                return enumeration;
             }
         }
         return null;
     }
 
     /**
-     * Get value of enum item.
+     * <p>Get value of enum item.</p>
      *
      * @return the enum item's value.
      */
@@ -181,32 +163,34 @@ public abstract class ValuedEnum extends Enum {
     }
 
     /**
-     * Tests for order. The default ordering is numeric by value, but this
-     * can be overridden by subclasses.
+     * <p>Tests for order.</p>
+     *
+     * <p>The default ordering is numeric by value, but this
+     * can be overridden by subclasses.</p>
      * 
      * @see java.lang.Comparable#compareTo(Object)
      * @param other  the other object to compare to
-     * @return -ve if this is less than the other object, +ve if greater than, 0 of equal
-     * @throws ClassCastException if other is not an Enum
-     * @throws NullPointerException if other is null
+     * @return -ve if this is less than the other object, +ve if greater than,
+     *  <code>0</code> of equal
+     * @throws ClassCastException if other is not an <code>Enum</code>
+     * @throws NullPointerException if other is <code>null</code>
      */
     public int compareTo(Object other) {
         return iValue - ((ValuedEnum) other).iValue;
     }
 
     /**
-     * Human readable description of this Enum item. For use when debugging.
-     * 
+     * <p>Human readable description of this <code>Enum</code> item.</p>
+     *
      * @return String in the form <code>type[name=value]</code>, for example:
-     * <code>JavaVersion[Java 1.0=100]</code>. Note that the package name is
-     * stripped from the type name.
+     *  <code>JavaVersion[Java 1.0=100]</code>. Note that the package name is
+     *  stripped from the type name.
      */
     public String toString() {
-        String shortName = getClass().getName();
-        int pos = shortName.lastIndexOf('.');
-        if (pos != -1) {
-            shortName = shortName.substring(pos + 1);
+        if (iToString == null) {
+            String shortName = ClassUtils.getShortClassName(getEnumClass());
+            iToString = shortName + "[" + getName() + "=" + getValue() + "]";
         }
-        return shortName + "[" + getName() + "=" + getValue() + "]";
+        return iToString;
     }
 }

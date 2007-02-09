@@ -1,205 +1,232 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.lang;
 
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- */
+import java.io.Serializable;
 
 /**
- * A range of characters. Able to understand the idea of a contiguous 
- * sublist of an alphabet, a negated concept, and a set of characters.
- * Used by CharSet to handle sets of characters.
+ * <p>A contiguous range of characters, optionally negated.</p>
+ * 
+ * <p>Instances are immutable.</p>
  *
- * @author <a href="bayard@generationjava.com">Henri Yandell</a>
- * @author <a href="mailto:scolebourne@joda.org">Stephen Colebourne</a>
- * @version $Id: CharRange.java,v 1.1 2002/07/19 03:35:54 bayard Exp $
+ * @author Stephen Colebourne
+ * @author Chris Feldhacker
+ * @author Gary Gregory
+ * @since 1.0
+ * @version $Id$
  */
-class CharRange {
+public final class CharRange implements Serializable {
 
     /**
-     * Used internally to represent null in a char.
-     */
-    private static char UNSET;
-
-    private char start;
-    private char close;
-    private boolean negated;
-
-    /**
-     * Construct a CharRange over a single character.
-     *
-     * @param start char over which this range is placed
-     */
-    public CharRange(char start) {
-        this.start = start;
-    }
-
-    /**
-     * Construct a CharRange over a set of characters.
-     *
-     * @param start  char start character in this range. inclusive
-     * @param close  char close character in this range. inclusive
-     */
-    public CharRange(char start, char close) {
-        this.start = start;
-        this.close = close;
-    }
-
-    /**
-     * Construct a CharRange over a set of characters.
-     *
-     * @param start  String start first character is in this range (inclusive).
-     * @param close  String first character is close character in this
-     * range (inclusive).
-     */
-    public CharRange(String start, String close) {
-        this.start = start.charAt(0);
-        this.close = close.charAt(0);
-    }
-
-    /**
-     * Get the start character for this character range
+     * Required for serialization support. Lang version 2.0. 
      * 
-     * @return start char (inclusive)
+     * @see java.io.Serializable
+     */
+    private static final long serialVersionUID = 8270183163158333422L;
+    
+    /** The first character, inclusive, in the range. */
+    private final char start;
+    /** The last character, inclusive, in the range. */
+    private final char end;
+    /** True if the range is everything except the characters specified. */
+    private final boolean negated;
+    
+    /** Cached toString. */
+    private transient String iToString;
+
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Constructs a <code>CharRange</code> over a single character.</p>
+     *
+     * @param ch  only character in this range
+     */
+    public CharRange(char ch) {
+        this(ch, ch, false);
+    }
+
+    /**
+     * <p>Constructs a <code>CharRange</code> over a single character,
+     * optionally negating the range.</p>
+     *
+     * <p>A negated range includes everything except the specified char.</p>
+     *
+     * @param ch  only character in this range
+     * @param negated  true to express everything except the range
+     */
+    public CharRange(char ch, boolean negated) {
+        this(ch, ch, negated);
+    }
+
+    /**
+     * <p>Constructs a <code>CharRange</code> over a set of characters.</p>
+     *
+     * @param start  first character, inclusive, in this range
+     * @param end  last character, inclusive, in this range
+     */
+    public CharRange(char start, char end) {
+        this(start, end, false);
+    }
+
+    /**
+     * <p>Constructs a <code>CharRange</code> over a set of characters,
+     * optionally negating the range.</p>
+     *
+     * <p>A negated range includes everything except that defined by the
+     * start and end characters.</p>
+     * 
+     * <p>If start and end are in the wrong order, they are reversed.
+     * Thus <code>a-e</code> is the same as <code>e-a</code>.</p>
+     *
+     * @param start  first character, inclusive, in this range
+     * @param end  last character, inclusive, in this range
+     * @param negated  true to express everything except the range
+     */
+    public CharRange(char start, char end, boolean negated) {
+        super();
+        if (start > end) {
+            char temp = start;
+            start = end;
+            end = temp;
+        }
+        
+        this.start = start;
+        this.end = end;
+        this.negated = negated;
+    }
+
+    // Accessors
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Gets the start character for this character range.</p>
+     * 
+     * @return the start char (inclusive)
      */
     public char getStart() {
         return this.start;
     }
 
     /**
-     * Get the end character for this character range
+     * <p>Gets the end character for this character range.</p>
      * 
-     * @return end char (inclusive)
+     * @return the end char (inclusive)
      */
     public char getEnd() {
-        return this.close;
+        return this.end;
     }
 
     /**
-     * Set the start character for this character range
+     * <p>Is this <code>CharRange</code> negated.</p>
      * 
-     * @param ch  start char (inclusive)
-     */
-    public void setStart(char ch) {
-        this.start = ch;
-    }
-
-    /**
-     * Set the end character for this character range
-     * 
-     * @param ch  start char (inclusive)
-     */
-    public void setEnd(char ch) {
-        this.close = ch;
-    }
-
-    /**
-     * Is this CharRange over many characters
+     * <p>A negated range includes everything except that defined by the
+     * start and end characters.</p>
      *
-     * @return boolean true is many characters
-     */
-    public boolean isRange() {
-        return this.close != UNSET;
-    }
-
-    /**
-     * Is the passed in character inside this range
-     *
-     * @return boolean true is in range
-     */
-    public boolean inRange(char ch) {
-        if(isRange()) {
-            return ((ch >= start) && (ch <= close) );
-        } else {
-            return start == ch;
-        }
-    }
-
-    /**
-     * Checks if this CharRange is negated.
-     *
-     * @return boolean true is negated
+     * @return <code>true</code> is negated
      */
     public boolean isNegated() {
         return negated;
     }
 
+    // Contains
+    //-----------------------------------------------------------------------
     /**
-     * Sets this character range to be negated or not. 
-     * This implies that this CharRange is over all characters except 
-     * the ones in this range.
-     * 
-     * @param negated  true to negate the range
+     * <p>Is the character specified contained in this range.</p>
+     *
+     * @param ch  the character to check
+     * @return <code>true</code> if this range contains the input character
      */
-    public void setNegated(boolean negated) {
-        this.negated = negated;
+    public boolean contains(char ch) {
+        return (ch >= start && ch <= end) != negated;
     }
 
     /**
-     * Output a string representation of the character range
+     * <p>Are all the characters of the passed in range contained in
+     * this range.</p>
+     *
+     * @param range  the range to check against
+     * @return <code>true</code> if this range entirely contains the input range
+     * @throws IllegalArgumentException if <code>null</code> input
+     */
+    public boolean contains(CharRange range) {
+        if (range == null) {
+            throw new IllegalArgumentException("The Range must not be null");
+        }
+        if (negated) {
+            if (range.negated) {
+                return start >= range.start && end <= range.end;
+            } else {
+                return range.end < start || range.start > end;
+            }
+        } else {
+            if (range.negated) {
+                return start == 0 && end == Character.MAX_VALUE;
+            } else {
+                return start <= range.start && end >= range.end;
+            }
+        }
+    }
+
+    // Basics
+    //-----------------------------------------------------------------------
+    /**
+     * <p>Compares two CharRange objects, returning true if they represent
+     * exactly the same range of characters defined in the same way.</p>
      * 
-     * @return string representation
+     * @param obj  the object to compare to
+     * @return true if equal
+     */
+    public boolean equals(Object obj) {
+        if (obj == this) {
+            return true;
+        }
+        if (obj instanceof CharRange == false) {
+            return false;
+        }
+        CharRange other = (CharRange) obj;
+        return start == other.start && end == other.end && negated == other.negated;
+    }
+
+    /**
+     * <p>Gets a hashCode compatible with the equals method.</p>
+     * 
+     * @return a suitable hashCode
+     */
+    public int hashCode() {
+        return 83 + start + 7 * end + (negated ? 1 : 0);
+    }
+    
+    /**
+     * <p>Gets a string representation of the character range.</p>
+     * 
+     * @return string representation of this range
      */
     public String toString() {
-        String str = "";
-        if(isNegated()) {
-            str += "^";
+        if (iToString == null) {
+            StringBuffer buf = new StringBuffer(4);
+            if (isNegated()) {
+                buf.append('^');
+            }
+            buf.append(start);
+            if (start != end) {
+                buf.append('-');
+                buf.append(end);
+            }
+            iToString = buf.toString();
         }
-        str += start;
-        if(isRange()) {
-            str += "-";
-            str += close;
-        }
-        return str;
+        return iToString;
     }
     
 }

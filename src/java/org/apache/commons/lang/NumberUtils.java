@@ -1,96 +1,69 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.lang;
 
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- */
-
-import java.math.BigInteger;
 import java.math.BigDecimal;
+import java.math.BigInteger;
+
 /**
- * Provides extra functionality for Java Number classes.
+ * <p>Provides extra functionality for Java Number classes.</p>
  *
- * @author <a href="mailto:bayard@generationjava.com">Henri Yandell</a>
  * @author <a href="mailto:rand_mcneely@yahoo.com">Rand McNeely</a>
- * @author <a href="mailto:scolebourne@joda.org">Stephen Colebourne</a>
+ * @author Stephen Colebourne
  * @author <a href="mailto:steve.downey@netfolio.com">Steve Downey</a>
- * @version $Id: NumberUtils.java,v 1.3 2002/09/28 10:34:54 scolebourne Exp $
+ * @author Eric Pugh
+ * @author Phil Steitz
+ * @since 1.0
+ * @version $Id$
+ * 
+ * @deprecated Moved to org.apache.commons.lang.math.
+ *             Class will be removed in Commons Lang 3.0.
  */
 public final class NumberUtils {
-
+    // DEPRECATED CLASS !!!
+    
     /**
-     * NumberUtils instances should NOT be constructed in standard programming.
-     * Instead, the class should be used as <code>NumberUtils.stringToInt("6");</code>.
-     * This constructor is public to permit tools that require a JavaBean instance
-     * to operate.
+     * <p><code>NumberUtils</code> instances should NOT be constructed in standard programming.
+     * Instead, the class should be used as <code>NumberUtils.stringToInt("6");</code>.</p>
+     *
+     * <p>This constructor is public to permit tools that require a JavaBean instance
+     * to operate.</p>
      */
     public NumberUtils() {
+      super();
     }
 
     //--------------------------------------------------------------------
     
     /**
-     * Convert a String to an int, returning zero if the conversion fails
+     * <p>Convert a <code>String</code> to an <code>int</code>, returning
+     * <code>zero</code> if the conversion fails.</p>
      * 
      * @param str  the string to convert
-     * @return the int represented by the string, or zero if conversion fails
+     * @return the int represented by the string, or <code>zero</code> if
+     *  conversion fails
      */
     public static int stringToInt(String str) {
         return stringToInt(str, 0);
     }
 
     /**
-     * Convert a String to an int, returning a default value if the 
-     * conversion fails.
+     * <p>Convert a <code>String</code> to an <code>int</code>, returning a
+     * default value if the conversion fails.</p>
      * 
      * @param str  the string to convert
      * @param defaultValue  the default value
@@ -142,24 +115,22 @@ public final class NumberUtils {
     // plus minus everything. Prolly more. A lot are not separable.
 
     /**
-     * <p>
-     * Turns a string value into a java.lang.Number.
-     * First, the value is examined for a type qualifier on the end 
+     * <p>Turns a string value into a java.lang.Number.</p>
+     *
+     * <p>First, the value is examined for a type qualifier on the end
      * (<code>'f','F','d','D','l','L'</code>).  If it is found, it starts 
-     * trying to create succissively larger types from the type specified
-     * until one is found that can hold the value.
-     * </p>
-     * <p>
-     * If a type specifier is not found, it will check for a decimal point
-     * and then try successively larger types from Integer to BigInteger 
-     * and from Float to BigDecimal.
-     * </p>
-     * <p>
-     * If the string starts with "0x" or "-0x", it will be interpreted as a 
-     * hexadecimal integer.  Values with leading 0's will not be interpreted 
-     * as octal.
-     * </p>
-     * 
+     * trying to create successively larger types from the type specified
+     * until one is found that can hold the value.</p>
+     *
+     * <p>If a type specifier is not found, it will check for a decimal point
+     * and then try successively larger types from <code>Integer</code> to
+     * <code>BigInteger</code> and from <code>Float</code> to
+     * <code>BigDecimal</code>.</p>
+     *
+     * <p>If the string starts with <code>0x</code> or <code>-0x</code>, it
+     * will be interpreted as a hexadecimal integer.  Values with leading
+     * <code>0</code>'s will not be interpreted as octal.</p>
+     *
      * @param val String containing a number
      * @return Number created from the string
      * @throws NumberFormatException if the value cannot be converted
@@ -221,8 +192,7 @@ public final class NumberUtils {
                 case 'L' :
                     if (dec == null
                         && exp == null
-                        && isDigits(numeric.substring(1))
-                        && (numeric.charAt(0) == '-' || Character.isDigit(numeric.charAt(0)))) {
+                        && (numeric.charAt(0) == '-' && isDigits(numeric.substring(1)) || isDigits(numeric))) {
                         try {
                             return createLong(numeric);
                         } catch (NumberFormatException nfe) {
@@ -238,11 +208,12 @@ public final class NumberUtils {
                         Float f = NumberUtils.createFloat(numeric);
                         if (!(f.isInfinite() || (f.floatValue() == 0.0F && !allZeros))) {
                             //If it's too big for a float or the float value = 0 and the string
-                            //has non-zeros in it, then float doens't have the presision we want
+                            //has non-zeros in it, then float does not have the precision we want
                             return f;
                         }
 
-                    } catch (NumberFormatException nfe) {
+                    } catch (NumberFormatException e) {
+                        // ignore the bad number
                     }
                     //Fall through
                 case 'd' :
@@ -253,10 +224,12 @@ public final class NumberUtils {
                             return d;
                         }
                     } catch (NumberFormatException nfe) {
+                        // empty catch
                     }
                     try {
                         return createBigDecimal(numeric);
                     } catch (NumberFormatException e) {
+                        // empty catch
                     }
                     //Fall through
                 default :
@@ -276,10 +249,12 @@ public final class NumberUtils {
                 try {
                     return createInteger(val);
                 } catch (NumberFormatException nfe) {
+                    // empty catch
                 }
                 try {
                     return createLong(val);
                 } catch (NumberFormatException nfe) {
+                    // empty catch
                 }
                 return createBigInteger(val);
 
@@ -292,6 +267,7 @@ public final class NumberUtils {
                         return f;
                     }
                 } catch (NumberFormatException nfe) {
+                    // empty catch
                 }
                 try {
                     Double d = createDouble(val);
@@ -299,6 +275,7 @@ public final class NumberUtils {
                         return d;
                     }
                 } catch (NumberFormatException nfe) {
+                    // empty catch
                 }
 
                 return createBigDecimal(val);
@@ -309,10 +286,12 @@ public final class NumberUtils {
     }
 
     /**
-     * Utility method for createNumber.  Returns true if s is null
+     * <p>Utility method for {@link #createNumber(java.lang.String)}.</p>
+     *
+     * <p>Returns <code>true</code> if s is <code>null</code>.</p>
      * 
      * @param s the String to check
-     * @return if it is all zeros or null
+     * @return if it is all zeros or <code>null</code>
      */
     private static boolean isAllZeros(String s) {
         if (s == null) {
@@ -329,10 +308,10 @@ public final class NumberUtils {
     //--------------------------------------------------------------------
     
     /**
-     * Convert a String to a Float
+     * <p>Convert a <code>String</code> to a <code>Float</code>.</p>
      * 
-     * @param val  a String to convert
-     * @return converted Float
+     * @param val  a <code>String</code> to convert
+     * @return converted <code>Float</code>
      * @throws NumberFormatException if the value cannot be converted
      */
     public static Float createFloat(String val) {
@@ -340,10 +319,10 @@ public final class NumberUtils {
     }
 
     /**
-     * Convert a String to a Double
+     * <p>Convert a <code>String</code> to a <code>Double</code>.</p>
      * 
-     * @param val  a String to convert
-     * @return converted Double
+     * @param val  a <code>String</code> to convert
+     * @return converted <code>Double</code>
      * @throws NumberFormatException if the value cannot be converted
      */
     public static Double createDouble(String val) {
@@ -351,11 +330,11 @@ public final class NumberUtils {
     }
 
     /**
-     * Convert a String to a Integer, handling hex and
-     * octal notations.
+     * <p>Convert a <code>String</code> to a <code>Integer</code>, handling
+     * hex and octal notations.</p>
      * 
-     * @param val  a String to convert
-     * @return converted Integer
+     * @param val  a <code>String</code> to convert
+     * @return converted <code>Integer</code>
      * @throws NumberFormatException if the value cannot be converted
      */
     public static Integer createInteger(String val) {
@@ -364,10 +343,10 @@ public final class NumberUtils {
     }
 
     /**
-     * Convert a String to a Long
+     * <p>Convert a <code>String</code> to a <code>Long</code>.</p>
      * 
-     * @param val  a String to convert
-     * @return converted Long
+     * @param val  a <code>String</code> to convert
+     * @return converted <code>Long</code>
      * @throws NumberFormatException if the value cannot be converted
      */
     public static Long createLong(String val) {
@@ -375,10 +354,10 @@ public final class NumberUtils {
     }
 
     /**
-     * Convert a String to a BigInteger
+     * <p>Convert a <code>String</code> to a <code>BigInteger</code>.</p>
      * 
-     * @param val  a String to convert
-     * @return converted BigInteger
+     * @param val  a <code>String</code> to convert
+     * @return converted <code>BigInteger</code>
      * @throws NumberFormatException if the value cannot be converted
      */
     public static BigInteger createBigInteger(String val) {
@@ -387,10 +366,10 @@ public final class NumberUtils {
     }
 
     /**
-     * Convert a String to a BigDecimal
+     * <p>Convert a <code>String</code> to a <code>BigDecimal</code>.</p>
      * 
-     * @param val  a String to convert
-     * @return converted BigDecimal
+     * @param val  a <code>String</code> to convert
+     * @return converted <code>BigDecimal</code>
      * @throws NumberFormatException if the value cannot be converted
      */
     public static BigDecimal createBigDecimal(String val) {
@@ -401,12 +380,12 @@ public final class NumberUtils {
     //--------------------------------------------------------------------
     
     /**
-     * Gets the minimum of three long values.
+     * <p>Gets the minimum of three <code>long</code> values.</p>
      * 
      * @param a  value 1
      * @param b  value 2
      * @param c  value 3
-     * @return  the largest of the values
+     * @return  the smallest of the values
      */
     public static long minimum(long a, long b, long c) {
         if (b < a) {
@@ -419,12 +398,12 @@ public final class NumberUtils {
     }
 
     /**
-     * Gets the minimum of three int values.
+     * <p>Gets the minimum of three <code>int</code> values.</p>
      * 
      * @param a  value 1
      * @param b  value 2
      * @param c  value 3
-     * @return  the largest of the values
+     * @return  the smallest of the values
      */
     public static int minimum(int a, int b, int c) {
         if (b < a) {
@@ -437,7 +416,7 @@ public final class NumberUtils {
     }
 
     /**
-     * Gets the maximum of three long values.
+     * <p>Gets the maximum of three <code>long</code> values.</p>
      * 
      * @param a  value 1
      * @param b  value 2
@@ -455,7 +434,7 @@ public final class NumberUtils {
     }
 
     /**
-     * Gets the maximum of three int values.
+     * <p>Gets the maximum of three <code>int</code> values.</p>
      * 
      * @param a  value 1
      * @param b  value 2
@@ -475,31 +454,38 @@ public final class NumberUtils {
     //--------------------------------------------------------------------
     
     /**
-     * Compares two doubles for order.
-     * <p>
-     * This method is more comprhensive than the standard Java greater than,
-     * less than and equals operators.
-     * It returns -1 if the first value is less than the second.
-     * It returns +1 if the first value is greater than the second.
-     * It returns 0 if the values are equal.
+     * <p>Compares two <code>doubles</code> for order.</p>
+     *
+     * <p>This method is more comprehensive than the standard Java greater
+     * than, less than and equals operators.</p>
+     * <ul>
+     *  <li>It returns <code>-1</code> if the first value is less than the second.
+     *  <li>It returns <code>+1</code> if the first value is greater than the second.
+     *  <li>It returns <code>0</code> if the values are equal.
+     * </ul>
+     *
      * <p>
      * The ordering is as follows, largest to smallest:
      * <ul>
-     * <li>NaN
-     * <li>Positive infinity
-     * <li>Maximum double
-     * <li>Normal positve numbers
-     * <li>+0.0
-     * <li>-0.0
-     * <li>Normal negative numbers
-     * <li>Minimum double (-Double.MAX_VALUE)
-     * <li>Negative infinity
+     *  <li>NaN
+     *  <li>Positive infinity
+     *  <li>Maximum double
+     *  <li>Normal positive numbers
+     *  <li>+0.0
+     *  <li>-0.0
+     *  <li>Normal negative numbers
+     *  <li>Minimum double (-Double.MAX_VALUE)
+     *  <li>Negative infinity
      * </ul>
-     * Comparing NaN with NaN will return 0.
+     * </p>
+     *
+     * <p>Comparing <code>NaN</code> with <code>NaN</code> will
+     * return <code>0</code>.</p>
      * 
-     * @param lhs  the first double
-     * @param rhs  the second double
-     * @return -1 if lhs is less, +1 if greater, 0 if equal to rhs
+     * @param lhs  the first <code>double</code>
+     * @param rhs  the second <code>double</code>
+     * @return <code>-1</code> if lhs is less, <code>+1</code> if greater,
+     *  <code>0</code> if equal to rhs
      */
     public static int compare(double lhs, double rhs) {
         if (lhs < rhs) {
@@ -531,31 +517,36 @@ public final class NumberUtils {
     }
     
     /**
-     * Compares two floats for order.
-     * <p>
-     * This method is more comprhensive than the standard Java greater than,
-     * less than and equals operators.
-     * It returns -1 if the first value is less than the second.
-     * It returns +1 if the first value is greater than the second.
-     * It returns 0 if the values are equal.
-     * <p>
-     * The ordering is as follows, largest to smallest:
+     * <p>Compares two floats for order.</p>
+     *
+     * <p>This method is more comprehensive than the standard Java greater than,
+     * less than and equals operators.</p>
+     * <ul>
+     *  <li>It returns <code>-1</code> if the first value is less than the second.
+     *  <li>It returns <code>+1</code> if the first value is greater than the second.
+     *  <li>It returns <code>0</code> if the values are equal.
+     * </ul>
+     *
+     * <p> The ordering is as follows, largest to smallest:
      * <ul>
      * <li>NaN
      * <li>Positive infinity
      * <li>Maximum float
-     * <li>Normal positve numbers
+     * <li>Normal positive numbers
      * <li>+0.0
      * <li>-0.0
      * <li>Normal negative numbers
      * <li>Minimum float (-Float.MAX_VALUE)
      * <li>Negative infinity
      * </ul>
-     * Comparing NaN with NaN will return 0.
+     *
+     * <p>Comparing <code>NaN</code> with <code>NaN</code> will return
+     * <code>0</code>.</p>
      * 
-     * @param lhs  the first float
-     * @param rhs  the second float
-     * @return -1 if lhs is less, +1 if greater, 0 if equal to rhs
+     * @param lhs  the first <code>float</code>
+     * @param rhs  the second <code>float</code>
+     * @return <code>-1</code> if lhs is less, <code>+1</code> if greater,
+     *  <code>0</code> if equal to rhs
      */
     public static int compare(float lhs, float rhs) {
         if (lhs < rhs) {
@@ -589,11 +580,14 @@ public final class NumberUtils {
     //--------------------------------------------------------------------
     
     /**
-     * Checks whether the String contains only digit characters.
-     * Null and blank string will return false.
+     * <p>Checks whether the <code>String</code> contains only
+     * digit characters.</p>
      *
-     * @param str  the string to check
-     * @return boolean contains only unicode numeric
+     * <p><code>Null</code> and empty String will return
+     * <code>false</code>.</p>
+     *
+     * @param str  the <code>String</code> to check
+     * @return <code>true</code> if str contains only unicode numeric
      */
     public static boolean isDigits(String str) {
         if ((str == null) || (str.length() == 0)) {
@@ -608,20 +602,20 @@ public final class NumberUtils {
     }
 
     /**
-     * <p>
-     * Checks whether the String a valid Java number.
-     * Valid numbers include hexadecimal marked with the "0x" qualifier,
-     * scientific notation and numbers marked with a type qualifier (e.g. 123L).
-     * </p>
-     * <p>
-     * Null and blank string will return false.
-     * </p>
-     * 
-     * @param str  the string to check
-     * @return true if the string is a correctly formatted number
+     * <p>Checks whether the String a valid Java number.</p>
+     *
+     * <p>Valid numbers include hexadecimal marked with the <code>0x</code>
+     * qualifier, scientific notation and numbers marked with a type
+     * qualifier (e.g. 123L).</p>
+     *
+     * <p><code>Null</code> and empty String will return
+     * <code>false</code>.</p>
+     *
+     * @param str  the <code>String</code> to check
+     * @return <code>true</code> if the string is a correctly formatted number
      */
     public static boolean isNumber(String str) {
-        if ((str == null) || (str.length() == 0)) {
+        if (StringUtils.isEmpty(str)) {
             return false;
         }
         char[] chars = str.toCharArray();
@@ -630,7 +624,7 @@ public final class NumberUtils {
         boolean hasDecPoint = false;
         boolean allowSigns = false;
         boolean foundDigit = false;
-        //Deal with any possible sign up front
+        // deal with any possible sign up front
         int start = (chars[0] == '-') ? 1 : 0;
         if (sz > start + 1) {
             if (chars[start] == '0' && chars[start + 1] == 'x') {
@@ -638,7 +632,7 @@ public final class NumberUtils {
                 if (i == sz) {
                     return false; // str == "0x"
                 }
-                //Checking hex (it can't be anything else)
+                // checking hex (it can't be anything else)
                 for (; i < chars.length; i++) {
                     if ((chars[i] < '0' || chars[i] > '9')
                         && (chars[i] < 'a' || chars[i] > 'f')
@@ -649,11 +643,11 @@ public final class NumberUtils {
                 return true;
             }
         }
-        sz--; //Don't want to loop to the last char, check it afterwords
-              //for type qualifiers
+        sz--; // don't want to loop to the last char, check it afterwords
+              // for type qualifiers
         int i = start;
-        //Loop to the next to last char or to the last char if we need another digit to
-        //make a valid number (e.g. chars[0..5] = "1234E")
+        // loop to the next to last char or to the last char if we need another digit to
+        // make a valid number (e.g. chars[0..5] = "1234E")
         while (i < sz || (i < sz + 1 && allowSigns && !foundDigit)) {
             if (chars[i] >= '0' && chars[i] <= '9') {
                 foundDigit = true;
@@ -661,14 +655,14 @@ public final class NumberUtils {
 
             } else if (chars[i] == '.') {
                 if (hasDecPoint || hasExp) {
-                    //Two decimal points or dec in exponent   
+                    // two decimal points or dec in exponent   
                     return false;
                 }
                 hasDecPoint = true;
             } else if (chars[i] == 'e' || chars[i] == 'E') {
-                //We've already taken care of hex.
+                // we've already taken care of hex.
                 if (hasExp) {
-                    //Two E's
+                    // two E's
                     return false;
                 }
                 if (!foundDigit) {
@@ -681,7 +675,7 @@ public final class NumberUtils {
                     return false;
                 }
                 allowSigns = false;
-                foundDigit = false; //We need a digit after the E
+                foundDigit = false; // we need a digit after the E
             } else {
                 return false;
             }
@@ -689,11 +683,11 @@ public final class NumberUtils {
         }
         if (i < chars.length) {
             if (chars[i] >= '0' && chars[i] <= '9') {
-                //No type qualifier, OK
+                // no type qualifier, OK
                 return true;
             }
             if (chars[i] == 'e' || chars[i] == 'E') {
-                //Can't have an E at the last byte
+                // can't have an E at the last byte
                 return false;
             }
             if (!allowSigns
@@ -705,12 +699,14 @@ public final class NumberUtils {
             }
             if (chars[i] == 'l'
                 || chars[i] == 'L') {
-                //Not allowing L with an exponoent
+                // not allowing L with an exponent
                 return foundDigit && !hasExp;
             }
+            // last character is illegal
+            return false;
         }
-        //allowSigns is true iff the val ends in 'E'
-        //Found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
+        // allowSigns is true iff the val ends in 'E'
+        // found digit it to make sure weird stuff like '.' and '1E-' doesn't pass
         return !allowSigns && foundDigit;
     }
 }

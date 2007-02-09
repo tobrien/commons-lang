@@ -1,68 +1,38 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.lang;
 
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- */
-
 /**
- * Represents a range of {@link Number} objects.
+ * <p>Represents a range of {@link Number} objects.</p>
+ * 
+ * <p>This class uses <code>double</code> comparisons. This means that it
+ * is unsuitable for dealing with large <code>Long</code>, <code>BigDecimal</code>
+ * or <code>BigInteger</code> numbers.</p>
  *
  * @author <a href="mailto:chrise@esha.com">Christopher Elkins</a>
- * @author <a href="mailto:scolebourne@joda.org">Stephen Colebourne</a>
- * @version $Revision: 1.1 $ $Date: 2002/07/19 03:35:54 $
+ * @author Stephen Colebourne
+ * @since 1.0
+ * @version $Revision$ $Date$
+ * 
+ * @deprecated Use one of the Range classes in org.apache.commons.lang.math.
+ *             Class will be removed in Commons Lang 3.0.
+ * 
  */
 public final class NumberRange {
-
 
     /* The minimum number in this range. */
     private final Number min;
@@ -72,15 +42,16 @@ public final class NumberRange {
 
 
     /**
-     * Constructs a new instance using the specified number as both the
-     * minimum and maximum in theis range.
+     * <p>Constructs a new <code>NumberRange</code> using
+     * <code>number</code> as both the minimum and maximum in
+     * this range.</p>
      *
      * @param num the number to use for this range
      * @throws NullPointerException if the number is <code>null</code>
      */
     public NumberRange(Number num) {
         if (num == null) {
-            throw new NullPointerException("num cannot be null");
+            throw new NullPointerException("The number must not be null");
         }
 
         this.min = num;
@@ -88,19 +59,22 @@ public final class NumberRange {
     }
 
     /**
-     * Constructs a new instance with the specified minimum and maximum
-     * numbers.
+     * <p>Constructs a new <code>NumberRange</code> with the specified
+     * minimum and maximum numbers.</p>
+     * 
+     * <p><em>If the maximum is less than the minimum, the range will be constructed
+     * from the minimum value to the minimum value, not what you would expect!.</em></p>
      *
      * @param min the minimum number in this range
      * @param max the maximum number in this range
      * @throws NullPointerException if either the minimum or maximum number is
-     *         <code>null</code>
+     *  <code>null</code>
      */
     public NumberRange(Number min, Number max) {
         if (min == null) {
-            throw new NullPointerException("min cannot be null");
+            throw new NullPointerException("The minimum value must not be null");
         } else if (max == null) {
-            throw new NullPointerException("max cannot be null");
+            throw new NullPointerException("The maximum value must not be null");
         }
 
         if (max.doubleValue() < min.doubleValue()) {
@@ -112,7 +86,7 @@ public final class NumberRange {
     }
 
     /**
-     * Returns the minimum number in this range.
+     * <p>Returns the minimum number in this range.</p>
      *
      * @return the minimum number in this range
      */
@@ -121,20 +95,21 @@ public final class NumberRange {
     }
 
     /**
-     * Returns the maximum number in this range.
+     * <p>Returns the maximum number in this range.</p>
      *
      * @return the maximum number in this range
      */
     public Number getMaximum() {
-        return min;
+        return max;
     }
 
     /**
-     * Tests whether the specified number occurs within this range.
+     * <p>Tests whether the specified <code>number</code> occurs within
+     * this range using <code>double</code> comparison.</p>
      *
      * @param number the number to test
      * @return <code>true</code> if the specified number occurs within this
-     *         range; otherwise, <code>false</code>
+     *  range; otherwise, <code>false</code>
      */
     public boolean includesNumber(Number number) {
         if (number == null) {
@@ -146,11 +121,12 @@ public final class NumberRange {
     }
 
     /**
-     * Tests whether the specified range occurs entirely within this range.
+     * <p>Tests whether the specified range occurs entirely within this
+     * range using <code>double</code> comparison.</p>
      *
      * @param range the range to test
      * @return <code>true</code> if the specified range occurs entirely within
-     *         this range; otherwise, <code>false</code>
+     *  this range; otherwise, <code>false</code>
      */
     public boolean includesRange(NumberRange range) {
         if (range == null) {
@@ -161,11 +137,12 @@ public final class NumberRange {
     }
 
     /**
-     * Tests whether the specified range overlaps with this range.
+     * <p>Tests whether the specified range overlaps with this range
+     * using <code>double</code> comparison.</p>
      *
      * @param range the range to test
      * @return <code>true</code> if the specified range overlaps with this
-     *         range; otherwise, <code>false</code>
+     *  range; otherwise, <code>false</code>
      */
     public boolean overlaps(NumberRange range) {
         if (range == null) {
@@ -177,11 +154,12 @@ public final class NumberRange {
     }
 
     /**
-     * Indicates whether some other object is "equal" to this one.
+     * <p>Indicates whether some other <code>Object</code> is
+     * &quot;equal&quot; to this one.</p>
      *
      * @param obj the reference object with which to compare
      * @return <code>true</code> if this object is the same as the obj
-     *         argument; <code>false</code> otherwise
+     *  argument; <code>false</code> otherwise
      */
     public boolean equals(Object obj) {
         if (obj == this) {
@@ -195,7 +173,7 @@ public final class NumberRange {
     }
 
     /**
-     * Returns a hash code value for this object.
+     * <p>Returns a hash code value for this object.</p>
      *
      * @return a hash code value for this object
      */
@@ -207,17 +185,18 @@ public final class NumberRange {
     }
 
     /**
-     * Returns the string representation of this range. This string is the
-     * string representation of the minimum and maximum numbers in the range,
-     * separated by a hyphen. If a number is negative, then it is enclosed
-     * in parentheses.
+     * <p>Returns the string representation of this range.</p>
+     *
+     * <p>This string is the string representation of the minimum and
+     * maximum numbers in the range, separated by a hyphen. If a number
+     * is negative, then it is enclosed in parentheses.</p>
      *
      * @return the string representation of this range
      */
     public String toString() {
         StringBuffer sb = new StringBuffer();
 
-        if (min.intValue() < 0) {
+        if (min.doubleValue() < 0) {
             sb.append('(')
                 .append(min)
                 .append(')');
@@ -227,7 +206,7 @@ public final class NumberRange {
 
         sb.append('-');
 
-        if (max.intValue() < 0) {
+        if (max.doubleValue() < 0) {
             sb.append('(')
                 .append(max)
                 .append(')');

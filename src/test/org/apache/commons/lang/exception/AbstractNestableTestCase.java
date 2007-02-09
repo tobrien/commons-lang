@@ -1,72 +1,32 @@
-
-package org.apache.commons.lang.exception;
-
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
+package org.apache.commons.lang.exception;
 
 import java.io.ByteArrayOutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 
 import junit.framework.TestCase;
-import junit.textui.TestRunner;
 /**
  * Tests implementations of the org.apache.commons.lang.exception.Nestable
  * interface.
  *
  * @author <a href="mailto:steven@caswell.name">Steven Caswell</a>
- * @version $Id: AbstractNestableTestCase.java,v 1.2 2002/09/11 19:40:14 stevencaswell Exp $
+ * @version $Id$
  */
 public abstract class AbstractNestableTestCase extends TestCase
 {
@@ -152,33 +112,40 @@ public abstract class AbstractNestableTestCase extends TestCase
 
         Nestable ne2 = getNestable("ne2");
         assertNotNull("nestable exception(\"ne2\") message is not null", ne2.getMessage());
-        assertTrue("nestable exception(\"ne2\") message == ne2", ne2.getMessage().equals("ne2"));
+        assertEquals("nestable exception(\"ne2\") message == ne2", ne2.getMessage(), "ne2");
         
         Nestable ne3 = getNestable(getThrowable("ne3 exception"));
         assertNotNull("nestable exception(Throwable(\"ne3 exception\") message is not null",
             ne3.getMessage()); 
-        assertTrue("nestable exception(Throwable(\"ne3 exception\") message == cause message",
-            ne3.getMessage().equals(ne3.getCause().getMessage())); 
+        assertEquals("nestable exception(Throwable(\"ne3 exception\") message equals cause.toString()",
+            ne3.getMessage(), ne3.getCause().toString()); 
         
         Nestable ne4 = getNestable("ne4", getThrowable("ne4 exception"));
         assertNotNull("nestable exception(\"ne4\", Throwable(\"ne4 exception\") message is not null", 
             ne4.getMessage()); 
-        assertTrue("nestable exception(\"ne4\", Throwable(\"ne4 exception\") message == ne4: ne4 exception", 
-            ne4.getMessage().equals("ne4: ne4 exception")); 
+        assertEquals("nestable exception(\"ne4\", Throwable(\"ne4 exception\") message == ne4", 
+            ne4.getMessage(), "ne4"); 
         
         Nestable ne5 = getNestable("ne5", (Throwable) null);
         assertNotNull("nestable exception(\"ne5\", null) message is not null", 
             ne5.getMessage()); 
-        assertTrue("nestable exception(\"ne5\", null) message == ne5", 
-            ne5.getMessage().equals("ne5")); 
+        assertEquals("nestable exception(\"ne5\", null) message == ne5", 
+            ne5.getMessage(), "ne5"); 
         
-        Nestable ne6 = getNestable(null, getThrowable("ne6 exception"));
-        assertTrue("nestable exception(null, Throwable(\"ne6 exception\") cause == ne6 exception", 
-            ne6.getMessage().equals("ne6 exception")); 
+        Throwable t6 = getThrowable("ne6 exception");
+        Nestable ne6 = getNestable(null, t6);
+        assertNotNull("nestable exception(null, Throwable(\"ne6 exception\") message is not null",
+            ne6.getMessage()); 
+        assertEquals("nestable exception(null, Throwable(\"ne6 exception\") message equals cause.toString()",
+            ne6.getMessage(), ne6.getCause().toString()); 
         
         Nestable ne7 = getNestable("ne7o", getNestable("ne7i", getThrowable("ne7 exception")));
-        assertTrue("nextable exception(\"ne7o\", getNestable(\"ne7i\", Throwable(\"ne7 exception\"))) message is ne7o: ne7i: ne7 exception",
-            ne7.getMessage().equals("ne7o: ne7i: ne7 exception"));
+        assertEquals("nestable exception(\"ne7o\", getNestable(\"ne7i\", Throwable(\"ne7 exception\"))) message is ne7o: ne7i: ne7 exception",
+            ne7.getMessage(), "ne7o");
+
+        Nestable ne8 = getNestable();
+        assertNull("nestable exception() message is null",
+            ne8.getMessage());
 
     }
 
@@ -394,7 +361,9 @@ public abstract class AbstractNestableTestCase extends TestCase
         {
             doNestableExceptionIndexOfThrowable(n, throwables[i], indexes[i], msgs[indexes[i]]);
         }
+        doNestableExceptionIndexOfThrowable(n, getBaseThrowableClass(), 0, msgs[0]);
         doNestableExceptionIndexOfThrowable(n, java.util.Date.class, -1, null);
+        doNestableExceptionIndexOfThrowable(n, null, -1, null);
     }
     
     private void doNestableExceptionIndexOfThrowable(Nestable n, Class type, int expectedIndex, String expectedMsg)
@@ -402,7 +371,7 @@ public abstract class AbstractNestableTestCase extends TestCase
         Throwable t = null;
         
         int index = n.indexOfThrowable(type);
-        assertEquals("index of throwable " + type.getName(), expectedIndex, index);
+        assertEquals("index of throwable " + (type == null ? "null" : type.getName()), expectedIndex, index);
         if(expectedIndex > -1)
         {
             t = n.getThrowable(index);
@@ -455,6 +424,7 @@ public abstract class AbstractNestableTestCase extends TestCase
         doNestableExceptionIndexOfThrowableI(n, getTester1Class(), 4, -1, null);
         doNestableExceptionIndexOfThrowableI(n, getThrowableClass(), 2, 4, msgs[4]);
         doNestableExceptionIndexOfThrowableI(n, java.util.Date.class, 0, -1, null);
+        doNestableExceptionIndexOfThrowableI(n, null, 0, -1, null);
         
         // Test for index out of bounds
         try
@@ -481,7 +451,7 @@ public abstract class AbstractNestableTestCase extends TestCase
         Throwable t = null;
         
         int index = n.indexOfThrowable(type, fromIndex);
-        assertEquals("index of throwable " + type.getName(), expectedIndex, index);
+        assertEquals("index of throwable " + (type == null ? "null" : type.getName()), expectedIndex, index);
         if(expectedIndex > -1)
         {
             t = n.getThrowable(index);
@@ -513,7 +483,7 @@ public abstract class AbstractNestableTestCase extends TestCase
         PrintWriter pw2 = new PrintWriter(ps2, true);
         ne9.printPartialStackTrace(pw2);
         String stack2 = baos2.toString();
-        String startsWith = ne9.getClass().getName() + ": ne9: ne9 exception";
+        String startsWith = ne9.getClass().getName() + ": ne9";
         assertTrue("stack trace startsWith == " + startsWith,
             stack2.startsWith(startsWith));
         assertEquals("stack trace indexOf rethrown == -1",
@@ -529,12 +499,12 @@ public abstract class AbstractNestableTestCase extends TestCase
         ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
         PrintStream ps1 = new PrintStream(baos1);
         PrintWriter pw1 = new PrintWriter(ps1, true);
-        ne8.printStackTrace(ps1);
+        ne8.printStackTrace(pw1);
         String stack1 = baos1.toString();
-        String startsWith = getThrowableClass().getName() + ": ne8 exception";
+        String startsWith = ne8.getClass().getName() + ": ne8";
         assertTrue("stack trace startsWith == " + startsWith,
             stack1.startsWith(startsWith));
-        String indexOf = ne8.getClass().getName() + ": ne8: ne8 exception";
+        String indexOf = getThrowableClass().getName() + ": ne8 exception";
         assertTrue("stack trace indexOf " + indexOf + " > -1",
             stack1.indexOf(indexOf) > -1); 
     }
@@ -699,5 +669,13 @@ public abstract class AbstractNestableTestCase extends TestCase
      * @return the class
      */
     public abstract Class getThrowableClass();
+
+    /**
+     * Returns the base class being used, typically Error, Eception or RuntimeException.
+     *
+     * @return the class
+     */
+    public abstract Class getBaseThrowableClass();
+
 }
 

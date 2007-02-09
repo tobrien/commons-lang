@@ -1,71 +1,37 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
-// package org.apache.commons.lang.builder
-
 package org.apache.commons.lang.builder;
+
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
 /**
- * Unit tests {@link org.apache.commons.lang.ToStringBuilder}.
+ * Unit tests for {@link org.apache.commons.lang.builder.ToStringBuilder}.
  *
  * @author <a href="mailto:scolebourne@joda.org">Stephen Colebourne</a>
- * @version $Id: ToStringBuilderTest.java,v 1.1 2002/09/17 22:07:50 scolebourne Exp $
+ * @author <a href="mailto:ggregory@seagullsw.com">Gary Gregory</a>
+ * @author <a href="mailto:alex@apache.org">Alex Chaffee</a>
+ * @version $Id$
  */
 public class ToStringBuilderTest extends TestCase {
 
@@ -97,46 +63,18 @@ public class ToStringBuilderTest extends TestCase {
     //-----------------------------------------------------------------------
 
     public void testConstructorEx1() {
-        try {
-            new ToStringBuilder(null);
-            
-        } catch (IllegalArgumentException ex) {
-            return;
-        }
-        fail();
+        assertEquals("<null>", new ToStringBuilder(null).toString());
     }
 
     public void testConstructorEx2() {
-        try {
-            new ToStringBuilder(null, null);
-            
-        } catch (IllegalArgumentException ex) {
-            try {
-                new ToStringBuilder(base, null);
-                
-            } catch (Exception ex2) {
-                fail();
-            }
-            return;
-        }
-        fail();
+        assertEquals("<null>", new ToStringBuilder(null, null).toString());
+        new ToStringBuilder(this.base, null).toString();
     }
 
     public void testConstructorEx3() {
-        try {
-            new ToStringBuilder(null, null, null);
-            
-        } catch (IllegalArgumentException ex) {
-            try {
-                new ToStringBuilder(base, null, null);
-                new ToStringBuilder(base, ToStringStyle.DEFAULT_STYLE, null);
-                
-            } catch (Exception ex2) {
-                fail();
-            }
-            return;
-        }
-        fail();
+        assertEquals("<null>", new ToStringBuilder(null, null, null).toString());
+        new ToStringBuilder(this.base, null, null);
+        new ToStringBuilder(this.base, ToStringStyle.DEFAULT_STYLE, null);
     }
 
     public void testGetSetDefault() {
@@ -163,8 +101,519 @@ public class ToStringBuilderTest extends TestCase {
         assertEquals(baseStr + "[]", new ToStringBuilder(base).toString());
     }
     
-    public void testReflection() {
+    /**
+     * Test wrapper for int primitive.
+     */
+    public void testReflectionInteger() {
         assertEquals(baseStr + "[value=5]", ToStringBuilder.reflectionToString(base));
+    }
+
+    /**
+     * Test wrapper for char primitive.
+     */
+    public void testReflectionCharacter() {
+        Character c = new Character('A');
+        assertEquals(this.toBaseString(c) + "[value=A]", ToStringBuilder.reflectionToString(c));
+    }
+
+    /**
+     * Test wrapper for char boolean.
+     */
+    public void testReflectionBoolean() {
+        Boolean b;
+        b = Boolean.TRUE;
+        assertEquals(this.toBaseString(b) + "[value=true]", ToStringBuilder.reflectionToString(b));
+        b = Boolean.FALSE;
+        assertEquals(this.toBaseString(b) + "[value=false]", ToStringBuilder.reflectionToString(b));
+    }
+
+    /**
+     * Create the same toString() as Object.toString().
+     * @param o the object to create the string for.
+     * @return a String in the Object.toString format.
+     */
+    private String toBaseString(Object o) {
+        return o.getClass().getName() + "@" + Integer.toHexString(System.identityHashCode(o));
+    }
+    
+    // Reflection Array tests
+    
+    //
+    // Note on the following line of code repeated in the reflection array tests.
+    //
+    // assertReflectionArray("<null>", array);
+    //
+    // The expected value is not baseStr + "[<null>]" since array==null and is typed as Object.
+    // The null array does not carry array type information.
+    // If we added a primitive array type constructor and pile of associated methods, 
+    // then type declaring type information could be carried forward. IMHO, null is null.
+    //
+    // Gary Gregory - 2003-03-12 - ggregory@seagullsw.com  
+    //
+    
+    public void assertReflectionArray(String expected, Object actual) {
+        if (actual == null) {
+            // Until ToStringBuilder supports null objects.
+            return;
+        }
+        assertEquals(expected, ToStringBuilder.reflectionToString(actual));
+        assertEquals(expected, ToStringBuilder.reflectionToString(actual, null));
+        assertEquals(expected, ToStringBuilder.reflectionToString(actual, null, true));
+        assertEquals(expected, ToStringBuilder.reflectionToString(actual, null, false));
+    }
+
+    public void testReflectionObjectArray() {
+        Object[] array = new Object[] { null, base, new int[] { 3, 6 } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{<null>,5,{3,6}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionLongArray() {
+        long[] array = new long[] { 1, 2, -3, 4 };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{1,2,-3,4}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionIntArray() {
+        int[] array = new int[] { 1, 2, -3, 4 };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{1,2,-3,4}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionShortArray() {
+        short[] array = new short[] { 1, 2, -3, 4 };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{1,2,-3,4}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionyteArray() {
+        byte[] array = new byte[] { 1, 2, -3, 4 };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{1,2,-3,4}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionCharArray() {
+        char[] array = new char[] { 'A', '2', '_', 'D' };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{A,2,_,D}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionDoubleArray() {
+        double[] array = new double[] { 1.0, 2.9876, -3.00001, 4.3 };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{1.0,2.9876,-3.00001,4.3}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionFloatArray() {
+        float[] array = new float[] { 1.0f, 2.9876f, -3.00001f, 4.3f };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{1.0,2.9876,-3.00001,4.3}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionBooleanArray() {
+        boolean[] array = new boolean[] { true, false, false };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{true,false,false}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+    
+    // Reflection Array Array tests
+
+    public void testReflectionFloatArrayArray() {
+        float[][] array = new float[][] { { 1.0f, 2.29686f }, null, { Float.NaN } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{{1.0,2.29686},<null>,{NaN}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+
+    public void testReflectionLongArrayArray() {
+        long[][] array = new long[][] { { 1, 2 }, null, { 5 } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{{1,2},<null>,{5}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionIntArrayArray() {
+        int[][] array = new int[][] { { 1, 2 }, null, { 5 } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{{1,2},<null>,{5}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionhortArrayArray() {
+        short[][] array = new short[][] { { 1, 2 }, null, { 5 } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{{1,2},<null>,{5}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionByteArrayArray() {
+        byte[][] array = new byte[][] { { 1, 2 }, null, { 5 } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{{1,2},<null>,{5}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionCharArrayArray() {
+        char[][] array = new char[][] { { 'A', 'B' }, null, { 'p' } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{{A,B},<null>,{p}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionDoubleArrayArray() {
+        double[][] array = new double[][] { { 1.0, 2.29686 }, null, { Double.NaN } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{{1.0,2.29686},<null>,{NaN}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionBooleanArrayArray() {
+        boolean[][] array = new boolean[][] { { true, false }, null, { false } };
+        String baseStr = this.toBaseString(array);
+        assertEquals(baseStr + "[{{true,false},<null>,{false}}]", ToStringBuilder.reflectionToString(array));
+        assertEquals(baseStr + "[{{true,false},<null>,{false}}]", ToStringBuilder.reflectionToString(array));
+        array = null;
+        assertReflectionArray("<null>", array);
+        this.validateEmptyToStringStyleRegistry();
+    }
+    
+    // Reflection hierarchy tests
+
+    public void testReflectionHierarchyArrayList() {
+        List base = new ArrayList();
+        String baseStr = this.toBaseString(base);
+        assertEquals(baseStr + "[elementData={<null>,<null>,<null>,<null>,<null>,<null>,<null>,<null>,<null>,<null>},size=0,modCount=0]", ToStringBuilder.reflectionToString(base, null, true));
+        assertEquals(baseStr + "[size=0]", ToStringBuilder.reflectionToString(base, null, false));
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionHierarchy() {
+        ReflectionTestFixtureA baseA = new ReflectionTestFixtureA();
+        String baseStr = this.toBaseString(baseA);
+        assertEquals(baseStr + "[a=a]", ToStringBuilder.reflectionToString(baseA));
+        assertEquals(baseStr + "[a=a]", ToStringBuilder.reflectionToString(baseA, null));
+        assertEquals(baseStr + "[a=a]", ToStringBuilder.reflectionToString(baseA, null, false));
+        assertEquals(baseStr + "[a=a,transientA=t]", ToStringBuilder.reflectionToString(baseA, null, true));
+        assertEquals(baseStr + "[a=a]", ToStringBuilder.reflectionToString(baseA, null, false, null));
+        assertEquals(baseStr + "[a=a]", ToStringBuilder.reflectionToString(baseA, null, false, Object.class));
+        assertEquals(baseStr + "[a=a]", ToStringBuilder.reflectionToString(baseA, null, false, List.class));
+        assertEquals(baseStr + "[a=a]", ToStringBuilder.reflectionToString(baseA, null, false, ReflectionTestFixtureA.class));
+        
+        ReflectionTestFixtureB baseB = new ReflectionTestFixtureB();
+        baseStr = this.toBaseString(baseB);
+        assertEquals(baseStr + "[b=b,a=a]", ToStringBuilder.reflectionToString(baseB));
+        assertEquals(baseStr + "[b=b,a=a]", ToStringBuilder.reflectionToString(baseB));
+        assertEquals(baseStr + "[b=b,a=a]", ToStringBuilder.reflectionToString(baseB, null));
+        assertEquals(baseStr + "[b=b,a=a]", ToStringBuilder.reflectionToString(baseB, null, false));
+        assertEquals(baseStr + "[b=b,transientB=t,a=a,transientA=t]", ToStringBuilder.reflectionToString(baseB, null, true));
+        assertEquals(baseStr + "[b=b,a=a]", ToStringBuilder.reflectionToString(baseB, null, false, null));
+        assertEquals(baseStr + "[b=b,a=a]", ToStringBuilder.reflectionToString(baseB, null, false, Object.class));
+        assertEquals(baseStr + "[b=b,a=a]", ToStringBuilder.reflectionToString(baseB, null, false, List.class));
+        assertEquals(baseStr + "[b=b,a=a]", ToStringBuilder.reflectionToString(baseB, null, false, ReflectionTestFixtureA.class));
+        assertEquals(baseStr + "[b=b]", ToStringBuilder.reflectionToString(baseB, null, false, ReflectionTestFixtureB.class));
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    static class ReflectionTestFixtureA {
+        private char a='a';
+        private transient char transientA='t';
+    }
+
+    static class ReflectionTestFixtureB extends ReflectionTestFixtureA {
+        private char b='b';
+        private transient char transientB='t';
+    }
+
+    public void testInnerClassReflection() {
+        Outer outer = new Outer();
+        assertEquals(toBaseString(outer) + "[inner=" + toBaseString(outer.inner) + "[]]", outer.toString());
+    }
+    
+    static class Outer {
+        Inner inner = new Inner();
+        class Inner {
+            public String toString() {
+                return ToStringBuilder.reflectionToString(this);
+            }
+        }
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this);
+        }
+    }
+    
+    // Reflection cycle tests
+
+    /**
+     * Test an array element pointing to its container.
+     */
+    public void testReflectionArrayCycle() throws Exception {
+        Object[] objects = new Object[1];
+        objects[0] = objects;
+        assertEquals(
+            this.toBaseString(objects) + "[{" + this.toBaseString(objects) + "}]",
+            ToStringBuilder.reflectionToString(objects));
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    /**
+     * Test an array element pointing to its container.
+     */
+    public void testReflectionArrayCycleLevel2() throws Exception {
+        Object[] objects = new Object[1];
+        Object[] objectsLevel2 = new Object[1];
+        objects[0] = objectsLevel2;
+        objectsLevel2[0] = (Object) objects;
+        assertEquals(
+            this.toBaseString(objects) + "[{{" + this.toBaseString(objects) + "}}]",
+            ToStringBuilder.reflectionToString(objects));
+        assertEquals(
+            this.toBaseString(objectsLevel2) + "[{{" + this.toBaseString(objectsLevel2) + "}}]",
+            ToStringBuilder.reflectionToString(objectsLevel2));
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    public void testReflectionArrayArrayCycle() throws Exception {
+        Object[][] objects = new Object[2][2];
+        objects[0][0] = objects;
+        objects[0][1] = objects;
+        objects[1][0] = objects;
+        objects[1][1] = objects;
+        String basicToString = this.toBaseString(objects);
+        assertEquals(
+            basicToString
+                + "[{{"
+                + basicToString
+                + ","
+                + basicToString
+                + "},{"
+                + basicToString
+                + ","
+                + basicToString
+                + "}}]",
+            ToStringBuilder.reflectionToString(objects));
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    /**
+     * A reflection test fixture.
+     */
+    static class ReflectionTestCycleA {
+        ReflectionTestCycleB b;
+
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this);
+        }
+    }
+
+    /**
+     * A reflection test fixture.
+     */
+    static class ReflectionTestCycleB {
+        ReflectionTestCycleA a;
+
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this);
+        }
+    }
+
+    /**
+     * A reflection test fixture.
+     */
+    static class SimpleReflectionTestFixture {
+        Object o;
+
+        public SimpleReflectionTestFixture() {
+        }
+
+        public SimpleReflectionTestFixture(Object o) {
+            this.o = o;
+        }
+
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this);
+        }
+    }
+
+    private static class SelfInstanceVarReflectionTestFixture {
+        private SelfInstanceVarReflectionTestFixture typeIsSelf;
+
+        public SelfInstanceVarReflectionTestFixture() {
+            this.typeIsSelf = this;
+        }
+
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this);
+        }
+      }
+    
+    private static class SelfInstanceTwoVarsReflectionTestFixture {
+        private SelfInstanceTwoVarsReflectionTestFixture typeIsSelf;
+        private String otherType = "The Other Type";
+
+        public SelfInstanceTwoVarsReflectionTestFixture() {
+            this.typeIsSelf = this;
+        }
+        
+        public String getOtherType(){
+            return this.otherType;
+        }
+
+        public String toString() {
+            return ToStringBuilder.reflectionToString(this);
+        }
+      }
+    
+    
+    /**
+     * Test an Object pointing to itself, the simplest test.
+     * 
+     * @throws Exception
+     */
+    public void testSimpleReflectionObjectCycle() throws Exception {
+        SimpleReflectionTestFixture simple = new SimpleReflectionTestFixture();
+        simple.o = simple;
+        assertTrue(ToStringStyle.getRegistry().isEmpty());
+        assertEquals(this.toBaseString(simple) + "[o=" + this.toBaseString(simple) + "]", simple.toString());
+        this.validateEmptyToStringStyleRegistry();
+    }
+
+    /**
+     * Test a class that defines an ivar pointing to itself.
+     * 
+     * @throws Exception
+     */
+    public void testSelfInstanceVarReflectionObjectCycle() throws Exception {
+        SelfInstanceVarReflectionTestFixture test = new SelfInstanceVarReflectionTestFixture();
+        assertTrue(ToStringStyle.getRegistry().isEmpty());
+        assertEquals(this.toBaseString(test) + "[typeIsSelf=" + this.toBaseString(test) + "]", test.toString());
+        this.validateEmptyToStringStyleRegistry();
+    }
+    
+    /**
+     * Test a class that defines an ivar pointing to itself.  This test was 
+     * created to show that handling cyclical object resulted in a missing endFieldSeparator call.
+     * 
+     * @throws Exception
+     */
+    public void testSelfInstanceTwoVarsReflectionObjectCycle() throws Exception {
+        SelfInstanceTwoVarsReflectionTestFixture test = new SelfInstanceTwoVarsReflectionTestFixture();
+        assertTrue(ToStringStyle.getRegistry().isEmpty());
+        assertEquals(this.toBaseString(test) + "[typeIsSelf=" + this.toBaseString(test) + ",otherType=" + test.getOtherType().toString() + "]", test.toString());
+        this.validateEmptyToStringStyleRegistry();
+    }
+    
+
+    /**
+     * Test Objects pointing to each other.
+     * 
+     * @throws Exception
+     */
+    public void testReflectionObjectCycle() throws Exception {
+        ReflectionTestCycleA a = new ReflectionTestCycleA();
+        ReflectionTestCycleB b = new ReflectionTestCycleB();
+        a.b = b;
+        b.a = a;
+        assertEquals(
+            this.toBaseString(a) + "[b=" + this.toBaseString(b) + "[a=" + this.toBaseString(a) + "]]",
+            a.toString());
+        this.validateEmptyToStringStyleRegistry();
+    }
+    
+    /**
+     * Test a nasty combination of arrays and Objects pointing to each other.
+     * objects[0] -> SimpleReflectionTestFixture[ o -> objects ]
+     * 
+     * @throws Exception
+     */
+    public void testReflectionArrayAndObjectCycle() throws Exception {
+        Object[] objects = new Object[1];
+        SimpleReflectionTestFixture simple = new SimpleReflectionTestFixture(objects);
+        objects[0] = (Object) simple;
+        assertEquals(
+            this.toBaseString(objects)
+                + "[{"
+                + this.toBaseString(simple)
+                + "[o="
+                + this.toBaseString(objects)
+                + "]"
+                + "}]",
+            ToStringBuilder.reflectionToString(objects));
+        assertEquals(
+            this.toBaseString(simple)
+                + "[o={"
+                + this.toBaseString(simple)
+                + "}]",
+            ToStringBuilder.reflectionToString(simple));
+        this.validateEmptyToStringStyleRegistry();
+    }
+        
+    void validateEmptyToStringStyleRegistry() {
+       if (!ToStringStyle.getRegistry().isEmpty()) {
+           System.out.println(ToStringStyle.getRegistry());
+       }
+       
+        assertTrue(ToStringStyle.getRegistry().isEmpty());        
+    }
+    //  End: Reflection cycle tests
+
+    public void testAppendSuper() {
+        assertEquals(baseStr + "[]", new ToStringBuilder(base).appendSuper("Integer@8888[]").toString());
+        assertEquals(baseStr + "[<null>]", new ToStringBuilder(base).appendSuper("Integer@8888[<null>]").toString());
+        
+        assertEquals(baseStr + "[a=hello]", new ToStringBuilder(base).appendSuper("Integer@8888[]").append("a", "hello").toString());
+        assertEquals(baseStr + "[<null>,a=hello]", new ToStringBuilder(base).appendSuper("Integer@8888[<null>]").append("a", "hello").toString());
+        assertEquals(baseStr + "[a=hello]", new ToStringBuilder(base).appendSuper(null).append("a", "hello").toString());
+    }
+    
+    public void testAppendToString() {
+        assertEquals(baseStr + "[]", new ToStringBuilder(base).appendToString("Integer@8888[]").toString());
+        assertEquals(baseStr + "[<null>]", new ToStringBuilder(base).appendToString("Integer@8888[<null>]").toString());
+        
+        assertEquals(baseStr + "[a=hello]", new ToStringBuilder(base).appendToString("Integer@8888[]").append("a", "hello").toString());
+        assertEquals(baseStr + "[<null>,a=hello]", new ToStringBuilder(base).appendToString("Integer@8888[<null>]").append("a", "hello").toString());
+        assertEquals(baseStr + "[a=hello]", new ToStringBuilder(base).appendToString(null).append("a", "hello").toString());
     }
     
     public void testObject() {
@@ -314,7 +763,6 @@ public class ToStringBuilderTest extends TestCase {
         assertEquals(baseStr + "[<null>]", new ToStringBuilder(base).append((Object) array).toString());
     }
 
-
     public void testLongArrayArray() {
         long[][] array = new long[][] {{1, 2}, null, {5}};
         assertEquals(baseStr + "[{{1,2},<null>,{5}}]", new ToStringBuilder(base).append(array).toString());
@@ -385,6 +833,142 @@ public class ToStringBuilderTest extends TestCase {
         array = null;
         assertEquals(baseStr + "[<null>]", new ToStringBuilder(base).append(array).toString());
         assertEquals(baseStr + "[<null>]", new ToStringBuilder(base).append((Object) array).toString());
+    }
+
+    public void testObjectCycle() {
+        ObjectCycle a = new ObjectCycle();
+        ObjectCycle b = new ObjectCycle();
+        a.obj = b;
+        b.obj = a;
+       
+        String expected = toBaseString(a) + "[" + toBaseString(b) + "[" + toBaseString(a) + "]]";
+        assertEquals(expected, a.toString());
+        validateEmptyToStringStyleRegistry();
+    }
+    
+    static class ObjectCycle {
+        Object obj;
+       
+        public String toString() {
+            return new ToStringBuilder(this).append(obj).toString();
+        }
+    }
+    
+    public void testSimpleReflectionStatics() {
+        SimpleReflectionStaticFieldsFixture instance1 = new SimpleReflectionStaticFieldsFixture();
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString=staticString,staticInt=12345]",
+            ReflectionToStringBuilder.toString(instance1, null, false, true, SimpleReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString=staticString,staticInt=12345]",
+            ReflectionToStringBuilder.toString(instance1, null, true, true, SimpleReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString=staticString,staticInt=12345]",
+            this.toStringWithStatics(instance1, null, SimpleReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString=staticString,staticInt=12345]",
+            this.toStringWithStatics(instance1, null, SimpleReflectionStaticFieldsFixture.class));
+    }
+
+    /**
+     * Tests ReflectionToStringBuilder.toString() for statics.
+     */
+    public void testReflectionStatics() {
+        ReflectionStaticFieldsFixture instance1 = new ReflectionStaticFieldsFixture();
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString=staticString,staticInt=12345,instanceString=instanceString,instanceInt=67890]",
+            ReflectionToStringBuilder.toString(instance1, null, false, true, ReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString=staticString,staticInt=12345,staticTransientString=staticTransientString,staticTransientInt=54321,instanceString=instanceString,instanceInt=67890,transientString=transientString,transientInt=98765]",
+            ReflectionToStringBuilder.toString(instance1, null, true, true, ReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString=staticString,staticInt=12345,instanceString=instanceString,instanceInt=67890]",
+            this.toStringWithStatics(instance1, null, ReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString=staticString,staticInt=12345,instanceString=instanceString,instanceInt=67890]",
+            this.toStringWithStatics(instance1, null, ReflectionStaticFieldsFixture.class));
+    }
+
+    /**
+     * Tests ReflectionToStringBuilder.toString() for statics.
+     */
+    public void testInheritedReflectionStatics() {
+        InheritedReflectionStaticFieldsFixture instance1 = new InheritedReflectionStaticFieldsFixture();
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString2=staticString2,staticInt2=67890]",
+            ReflectionToStringBuilder.toString(instance1, null, false, true, InheritedReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString2=staticString2,staticInt2=67890,staticString=staticString,staticInt=12345]",
+            ReflectionToStringBuilder.toString(instance1, null, false, true, SimpleReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString2=staticString2,staticInt2=67890,staticString=staticString,staticInt=12345]",
+            this.toStringWithStatics(instance1, null, SimpleReflectionStaticFieldsFixture.class));
+        assertEquals(
+            this.toBaseString(instance1) + "[staticString2=staticString2,staticInt2=67890,staticString=staticString,staticInt=12345]",
+            this.toStringWithStatics(instance1, null, SimpleReflectionStaticFieldsFixture.class));
+    }
+
+    /**
+     * <p>This method uses reflection to build a suitable
+     * <code>toString</code> value which includes static fields.</p>
+     *
+     * <p>It uses <code>AccessibleObject.setAccessible</code> to gain access to private
+     * fields. This means that it will throw a security exception if run
+     * under a security manager, if the permissions are not set up correctly.
+     * It is also not as efficient as testing explicitly. </p>
+     *
+     * <p>Transient fields are not output.</p>
+     *
+     * <p>Superclass fields will be appended up to and including the specified superclass. 
+     * A null superclass is treated as <code>java.lang.Object</code>.</p>
+     *
+     * <p>If the style is <code>null</code>, the default
+     * <code>ToStringStyle</code> is used.</p>
+     * 
+     * @param object  the Object to be output
+     * @param style  the style of the <code>toString</code> to create,
+     *  may be <code>null</code>
+     * @param reflectUpToClass  the superclass to reflect up to (inclusive),
+     *  may be <code>null</code>
+     * @return the String result
+     * @throws IllegalArgumentException if the Object is <code>null</code>
+     */
+    public Object toStringWithStatics(Object object, ToStringStyle style, Class reflectUpToClass) {
+        return ReflectionToStringBuilder.toString(object, style, false, true, reflectUpToClass);
+    }
+
+    /**
+     * Tests ReflectionToStringBuilder.toString() for statics.
+     */
+    class ReflectionStaticFieldsFixture {
+        static final String staticString = "staticString";
+        static final int staticInt = 12345;
+        static final transient String staticTransientString = "staticTransientString";
+        static final transient int staticTransientInt = 54321;
+        String instanceString = "instanceString";
+        int instanceInt = 67890;
+        transient String transientString = "transientString";
+        transient int transientInt = 98765;
+    }
+
+    /**
+     * Test fixture for ReflectionToStringBuilder.toString() for statics.
+     */
+    class SimpleReflectionStaticFieldsFixture {
+        static final String staticString = "staticString";
+        static final int staticInt = 12345;
+    }
+
+    /**
+     * Test fixture for ReflectionToStringBuilder.toString() for statics.
+     */
+    class InheritedReflectionStaticFieldsFixture extends SimpleReflectionStaticFieldsFixture {
+        static final String staticString2 = "staticString2";
+        static final int staticInt2 = 67890;
+    }
+
+    public void testReflectionNull() {
+        assertEquals("<null>", ReflectionToStringBuilder.toString(null));
     }
 
 }

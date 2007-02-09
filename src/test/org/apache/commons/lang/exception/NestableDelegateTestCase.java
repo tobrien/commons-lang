@@ -1,79 +1,44 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.lang.exception;
 
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- */
-
 import java.io.ByteArrayOutputStream;
-import java.io.PrintWriter;
+import java.io.EOFException;
+import java.io.IOException;
 import java.io.PrintStream;
+import java.io.PrintWriter;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
 /**
  * Tests the org.apache.commons.lang.exception.NestableDelegate class.
  *
  * @author <a href="mailto:steven@caswell.name">Steven Caswell</a>
  * @author <a href="mailto:dlr@finemaltcoding.com">Daniel Rall</a>
- * @version $Id: NestableDelegateTestCase.java,v 1.3 2002/09/18 15:51:41 stevencaswell Exp $
+ * @version $Id$
  */
-public class NestableDelegateTestCase extends junit.framework.TestCase
-{
+public class NestableDelegateTestCase extends junit.framework.TestCase {
     private static final String CONSTRUCTOR_FAILED_MSG = 
     "The Nestable implementation passed to the NestableDelegate(Nestable) constructor must extend java.lang.Throwable";
 
     private static final String PARTIAL_STACK_TRACE =
-        "rethrown as ThrowableNestedNestable partial stack trace place-holder";
+        "ThrowableNestedNestable partial stack trace place-holder";
 
     protected String lineSeparator;
 
@@ -174,7 +139,15 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         d = new NestableDelegate(n);
         doNestableDelegateGetThrowableCount(d, 2);
         
-        n = new NestableDelegateTester1("level 1", new NestableDelegateTester2("level 2", new NestableDelegateTester1(new NestableDelegateTester2("level 4", new Exception("level 5")))));
+        n = new NestableDelegateTester1("level 1", 
+                new NestableDelegateTester2("level 2", 
+                    new NestableDelegateTester1(
+                        new NestableDelegateTester2("level 4", 
+                            new Exception("level 5")
+                        )
+                    )
+                )
+            );
         d = new NestableDelegate(n);
         doNestableDelegateGetThrowableCount(d, 5);
     }
@@ -220,7 +193,15 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         msgs[2] = null;
         msgs[3] = "level 4";
         msgs[4] = "level 5";
-        n = new NestableDelegateTester1(msgs[0], new NestableDelegateTester2(msgs[1], new NestableDelegateTester1(new NestableDelegateTester2(msgs[3], new Exception(msgs[4])))));
+        n = new NestableDelegateTester1(msgs[0], 
+                new NestableDelegateTester2(msgs[1], 
+                    new NestableDelegateTester1(
+                        new NestableDelegateTester2(msgs[3], 
+                            new Exception(msgs[4])
+                        )
+                    )
+                )
+            );
         d = new NestableDelegate(n);
         doNestableDelegateGetMessages(d, msgs);
     }
@@ -235,6 +216,25 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
             assertEquals("message " + i, nMsgs[i], dMsgs[i]);
         }
     }
+    
+    public void testGetMessageString()
+    {
+        NestableDelegateTester1 ndt1 = new NestableDelegateTester1 (new NullPointerException ());
+        NestableDelegate nd = new NestableDelegate (ndt1);
+        assertNull (nd.getMessage((String)null));
+        
+        ndt1 = new NestableDelegateTester1 (new NullPointerException ("null pointer"));
+        nd = new NestableDelegate (ndt1);
+        assertNotNull(nd.getMessage((String)null));
+        
+        ndt1 = new NestableDelegateTester1 ();
+        nd = new NestableDelegate (ndt1);
+        assertNull(nd.getMessage((String)null));
+        
+        ndt1 = new NestableDelegateTester1 ("root");
+        nd = new NestableDelegate (ndt1);
+        assertNull(nd.getMessage((String)null));
+    }
 
     public void testNestableDelegateGetMessageN()
     {
@@ -246,7 +246,15 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         msgs[2] = null;
         msgs[3] = "level 4";
         msgs[4] = "level 5";
-        n = new NestableDelegateTester1(msgs[0], new NestableDelegateTester2(msgs[1], new NestableDelegateTester1(new NestableDelegateTester2(msgs[3], new Exception(msgs[4])))));
+        n = new NestableDelegateTester1(msgs[0], 
+                new NestableDelegateTester2(msgs[1], 
+                    new NestableDelegateTester1(
+                        new NestableDelegateTester2(msgs[3], 
+                            new Exception(msgs[4])
+                        )
+                    )
+                )
+            );
         d = new NestableDelegate(n);
         for(int i = 0; i < msgs.length; i++)
         {
@@ -301,7 +309,15 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         throwables[2] = NestableDelegateTester1.class;
         throwables[3] = NestableDelegateTester2.class;
         throwables[4] = Exception.class;        
-        n = new NestableDelegateTester1(msgs[0], new NestableDelegateTester2(msgs[1], new NestableDelegateTester1(new NestableDelegateTester2(msgs[3], new Exception(msgs[4])))));
+        n = new NestableDelegateTester1(msgs[0], 
+                new NestableDelegateTester2(msgs[1], 
+                    new NestableDelegateTester1(
+                        new NestableDelegateTester2(msgs[3], 
+                            new Exception(msgs[4])
+                            )
+                        )
+                    )
+                );
         d = new NestableDelegate(n);
         doNestableDelegateGetThrowableN(d, throwables, msgs);
     }
@@ -374,7 +390,15 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         throwables[2] = NestableDelegateTester1.class;
         throwables[3] = NestableDelegateTester2.class;
         throwables[4] = Exception.class;        
-        n = new NestableDelegateTester1(msgs[0], new NestableDelegateTester2(msgs[1], new NestableDelegateTester1(new NestableDelegateTester2(msgs[3], new Exception(msgs[4])))));
+        n = new NestableDelegateTester1(msgs[0], 
+                new NestableDelegateTester2(msgs[1], 
+                    new NestableDelegateTester1(
+                        new NestableDelegateTester2(msgs[3], 
+                            new Exception(msgs[4])
+                        )
+                    )
+                )
+            );
         d = new NestableDelegate(n);
         doNestableDelegateGetThrowables(d, throwables, msgs);
     }
@@ -420,9 +444,17 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         throwables[1] = NestableDelegateTester2.class;
         throwables[2] = NestableDelegateTester1.class;
         throwables[3] = NestableDelegateTester2.class;
-        throwables[4] = Exception.class;
+        throwables[4] = EOFException.class;
         int[] indexes = {0, 1, 0, 1, 4};
-        n = new NestableDelegateTester1(msgs[0], new NestableDelegateTester2(msgs[1], new NestableDelegateTester1(new NestableDelegateTester2(msgs[3], new Exception(msgs[4])))));
+        n = new NestableDelegateTester1(msgs[0], 
+                new NestableDelegateTester2(msgs[1], 
+                    new NestableDelegateTester1(
+                        new NestableDelegateTester2(msgs[3], 
+                            new EOFException(msgs[4])
+                        )
+                    )
+                )
+            );
         d = new NestableDelegate(n);
         for(int i = 0; i < throwables.length; i++)
         {
@@ -432,8 +464,12 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         doNestableDelegateIndexOfThrowable(d, NestableDelegateTester1.class, 1, 2, msgs[2]);
         doNestableDelegateIndexOfThrowable(d, NestableDelegateTester1.class, 3, -1, null);
         doNestableDelegateIndexOfThrowable(d, NestableDelegateTester1.class, 4, -1, null);
-        doNestableDelegateIndexOfThrowable(d, Exception.class, 2, 4, msgs[4]);
+        doNestableDelegateIndexOfThrowable(d, EOFException.class, 2, 4, msgs[4]);
+        doNestableDelegateIndexOfThrowable(d, IOException.class, 2, 4, msgs[4]);
+        doNestableDelegateIndexOfThrowable(d, Exception.class, 2, 2, msgs[2]);
+        doNestableDelegateIndexOfThrowable(d, Exception.class, 0, 0, msgs[0]);
         doNestableDelegateIndexOfThrowable(d, java.util.Date.class, 0, -1, null);
+        doNestableDelegateIndexOfThrowable(d, null, 0, -1, null);
         
         // Test for index out of bounds
         try
@@ -459,7 +495,7 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         Throwable t = null;
         
         int index = d.indexOfThrowable(type, fromIndex);
-        assertEquals("index of throwable " + type.getName(), expectedIndex, index);
+        assertEquals("index of throwable " + (type == null ? "null" : type.getName()), expectedIndex, index);
         if(expectedIndex > -1)
         {
             t = d.getThrowable(index);
@@ -490,26 +526,53 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
         PrintStream ps1 = new PrintStream(baos1);
         nd3.printStackTrace(ps1);
         String stack1 = baos1.toString();
-        assertTrue("stack trace startsWith == java.lang.Exception: nested exception 3",
-            stack1.startsWith("java.lang.Exception: nested exception 3"));
-        int start1 = (stack1.length() - lineSepLen) - partialStackTraceLen;
-        int end1 = stack1.length() - lineSepLen;
-        assertEquals("stack trace substring(" + start1 + "," + end1 + ") == " +
-                     PARTIAL_STACK_TRACE,
-                     PARTIAL_STACK_TRACE,
-                     stack1.substring(start1, end1));
+        assertTrue("stack trace startsWith", stack1.startsWith(PARTIAL_STACK_TRACE));
 
-        ByteArrayOutputStream baos2 = new ByteArrayOutputStream();
-        PrintStream ps2 = new PrintStream(baos2);
-        System.setErr(ps2);
-        nd3.printStackTrace();
-        String stack2 = baos2.toString();
-        assertTrue("stack trace startsWith == java.lang.Exception: nested exception 3",
-            stack2.startsWith("java.lang.Exception: nested exception 3"));
-        int start2 = (stack2.length() - lineSepLen) - partialStackTraceLen;
-        int end2 = stack2.length() - lineSepLen;
-        assertTrue("stack trace substring(" + start2 + "," + end2 + ") == " + PARTIAL_STACK_TRACE,
-            stack2.substring(start2, end2).equals(PARTIAL_STACK_TRACE));
+        Nestable n = new NestableDelegateTester1("level 1", 
+                new NestableDelegateTester2("level 2", 
+                    new NestableDelegateTester1(
+                        new NestableDelegateTester2("level 4", 
+                            new Exception("level 5")
+                        )
+                    )
+                )
+            );
+        NestableDelegate d = new NestableDelegate(n);
+        
+        // Only testing the flags for jdk1.3 and below
+        if (!ExceptionUtils.isThrowableNested()) {
+            NestableDelegate.topDown = true; NestableDelegate.trimStackFrames = true;
+            checkStackTrace(d, true, true, NestableDelegateTester1.class.getName()+": level 1", 24);
+            NestableDelegate.topDown = true; NestableDelegate.trimStackFrames = false;
+            checkStackTrace(d, true, false, NestableDelegateTester1.class.getName()+": level 1", 80);
+            NestableDelegate.topDown = false; NestableDelegate.trimStackFrames = true;
+            checkStackTrace(d, false, true, "java.lang.Exception: level 5", 24);
+            NestableDelegate.topDown = false; NestableDelegate.trimStackFrames = false;
+            checkStackTrace(d, false, false, "java.lang.Exception: level 5", 80);
+            NestableDelegate.topDown = true; NestableDelegate.trimStackFrames = true;
+        }
+    }
+    private void checkStackTrace(NestableDelegate d, boolean topDown, boolean trimStackFrames,
+            String startsWith, int expCount) {
+        ByteArrayOutputStream baos1 = new ByteArrayOutputStream();
+        PrintStream ps1 = new PrintStream(baos1);
+        d.printStackTrace(ps1);
+        String stack1 = baos1.toString();
+        int actCount = countLines(stack1);
+        assertTrue("topDown: "+topDown+", trimStackFrames: "+trimStackFrames+" startsWith",
+            stack1.startsWith(startsWith));
+        // test is unreliable, as count varies depending on JUnit version/where main method is
+//        assertEquals("topDown: "+topDown+", trimStackFrames: "+trimStackFrames+" lineCount",
+//            expCount, actCount);
+    }
+    private int countLines(String s) {
+        if (s == null) return 0;
+        
+        int i = 0, ndx = -1;
+        while ((ndx = s.indexOf("\n", ndx+1)) != -1) {
+            i++;
+        }
+        return i;
     }
     
     public static void main(String args[])
@@ -518,6 +581,11 @@ public class NestableDelegateTestCase extends junit.framework.TestCase
     }
 }
 
+/**
+ * Nestable and Throwable class which can be passed to the NestableDelegate
+ * constructor. Used for testing various methods which iterate through the
+ * nested causes.
+ */
 class NestableDelegateTester1 extends Exception implements Nestable
 {
     private Throwable cause = null;
@@ -605,6 +673,7 @@ class NestableDelegateTester1 extends Exception implements Nestable
      */
     public void printPartialStackTrace(PrintWriter out)
     {
+        super.printStackTrace(out);
     }
     
     /**
@@ -633,6 +702,11 @@ class NestableDelegateTester1 extends Exception implements Nestable
     
 }
 
+/**
+ * Nestable and Throwable class which can be passed to the NestableDelegate
+ * constructor. Used for testing various methods which iterate through the
+ * nested causes.
+ */
 class NestableDelegateTester2 extends Throwable implements Nestable
 {
     private Throwable cause = null;
@@ -722,6 +796,7 @@ class NestableDelegateTester2 extends Throwable implements Nestable
      */
     public void printPartialStackTrace(PrintWriter out)
     {
+        super.printStackTrace(out);
     }
     
     /**
@@ -750,6 +825,11 @@ class NestableDelegateTester2 extends Throwable implements Nestable
     
 }
 
+/**
+ * Used to test that the constructor passes when passed a throwable cause
+ * And, the NestableDelegate.getMessage() returns the message from underlying 
+ * nestable (which also has to be a Throwable).
+ */
 class ThrowableNestable extends Throwable implements Nestable
 {
     private Throwable cause = new Exception("ThrowableNestable cause");
@@ -860,6 +940,11 @@ class ThrowableNestable extends Throwable implements Nestable
     
 }
 
+/**
+ * Nestable and Throwable class which takes in a 'cause' object.
+ * Returns a message wrapping the 'cause' message
+ * Prints a fixed stack trace and partial stack trace.
+ */
 class ThrowableNestedNestable extends Throwable implements Nestable
 {
     private Throwable cause = null;
@@ -980,6 +1065,9 @@ class ThrowableNestedNestable extends Throwable implements Nestable
     
 }
 
+/**
+ * Used to test that the constructor fails when passed a non-throwable cause
+ */
 class NonThrowableNestable implements Nestable
 {
     /**

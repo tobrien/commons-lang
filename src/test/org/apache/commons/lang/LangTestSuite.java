@@ -1,55 +1,18 @@
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
  */
 package org.apache.commons.lang;
 
@@ -57,12 +20,14 @@ import junit.framework.Test;
 import junit.framework.TestCase;
 import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
 /**
  * Test suite for the Lang package.
  *
- * @author <a href="mailto:scolebourne@joda.org">Stephen Colebourne</a>
+ * @author Stephen Colebourne
  * @author <a href="mailto:ridesmet@users.sourceforge.net">Ringo De Smet</a>
- * @version $Id: LangTestSuite.java,v 1.5 2002/10/13 22:42:59 scolebourne Exp $
+ * @author Matthew Hawthorne
+ * @version $Id$
  */
 public class LangTestSuite extends TestCase {
     
@@ -87,7 +52,23 @@ public class LangTestSuite extends TestCase {
         TestSuite suite = new TestSuite();
         suite.setName("Commons-Lang Tests");
         suite.addTest(ArrayUtilsTest.suite());
+        suite.addTest(ArrayUtilsAddTest.suite());
+        suite.addTest(ArrayUtilsRemoveTest.suite());
+        suite.addTest(BitFieldTest.suite());
+        suite.addTest(BooleanUtilsTest.suite());
+        suite.addTest(CharEncodingTest.suite());
+        suite.addTest(CharRangeTest.suite());
+        suite.addTest(CharSetTest.suite());
         suite.addTest(CharSetUtilsTest.suite());
+        suite.addTest(CharUtilsTest.suite());
+        suite.addTest(ClassUtilsTest.suite());
+        suite.addTest(EntitiesTest.suite());
+        suite.addTest(IllegalClassExceptionTest.suite());
+        suite.addTest(IncompleteArgumentExceptionTest.suite());
+        suite.addTest(IntHashMapTest.suite());
+        suite.addTest(LocaleUtilsTest.suite());
+        suite.addTest(NotImplementedExceptionTest.suite());
+        suite.addTest(NullArgumentExceptionTest.suite());
         suite.addTest(NumberRangeTest.suite());
         suite.addTest(NumberUtilsTest.suite());
         suite.addTest(ObjectUtilsTest.suite());
@@ -98,6 +79,11 @@ public class LangTestSuite extends TestCase {
         suite.addTest(StringUtilsSubstringTest.suite());
         suite.addTest(StringUtilsEqualsIndexOfTest.suite());
         suite.addTest(StringUtilsIsTest.suite());
+        suite.addTest(StringEscapeUtilsTest.suite());
+        suite.addTest(SystemUtilsTest.suite());
+        suite.addTest(UnhandledExceptionTest.suite());
+        suite.addTest(ValidateTest.suite());
+        suite.addTest(WordUtilsTest.suite());
         return suite;
     }
 }

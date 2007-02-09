@@ -1,77 +1,39 @@
+/*
+ * Licensed to the Apache Software Foundation (ASF) under one or more
+ * contributor license agreements.  See the NOTICE file distributed with
+ * this work for additional information regarding copyright ownership.
+ * The ASF licenses this file to You under the Apache License, Version 2.0
+ * (the "License"); you may not use this file except in compliance with
+ * the License.  You may obtain a copy of the License at
+ * 
+ *      http://www.apache.org/licenses/LICENSE-2.0
+ * 
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
 package org.apache.commons.lang.exception;
 
-/* ====================================================================
- * The Apache Software License, Version 1.1
- *
- * Copyright (c) 2002 The Apache Software Foundation.  All rights
- * reserved.
- *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions
- * are met:
- *
- * 1. Redistributions of source code must retain the above copyright
- *    notice, this list of conditions and the following disclaimer.
- *
- * 2. Redistributions in binary form must reproduce the above copyright
- *    notice, this list of conditions and the following disclaimer in
- *    the documentation and/or other materials provided with the
- *    distribution.
- *
- * 3. The end-user documentation included with the redistribution, if
- *    any, must include the following acknowlegement:
- *       "This product includes software developed by the
- *        Apache Software Foundation (http://www.apache.org/)."
- *    Alternately, this acknowlegement may appear in the software itself,
- *    if and wherever such third-party acknowlegements normally appear.
- *
- * 4. The names "The Jakarta Project", "Commons", and "Apache Software
- *    Foundation" must not be used to endorse or promote products derived
- *    from this software without prior written permission. For written
- *    permission, please contact apache@apache.org.
- *
- * 5. Products derived from this software may not be called "Apache"
- *    nor may "Apache" appear in their names without prior written
- *    permission of the Apache Software Foundation.
- *
- * THIS SOFTWARE IS PROVIDED ``AS IS'' AND ANY EXPRESSED OR IMPLIED
- * WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE IMPLIED WARRANTIES
- * OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
- * DISCLAIMED.  IN NO EVENT SHALL THE APACHE SOFTWARE FOUNDATION OR
- * ITS CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL,
- * SPECIAL, EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT
- * LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF
- * USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND
- * ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
- * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT
- * OF THE USE OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF
- * SUCH DAMAGE.
- * ====================================================================
- *
- * This software consists of voluntary contributions made by many
- * individuals on behalf of the Apache Software Foundation.  For more
- * information on the Apache Software Foundation, please see
- * <http://www.apache.org/>.
- */
-
-import java.io.ByteArrayOutputStream;
 import java.io.ByteArrayInputStream;
-import java.io.PrintStream;
-import java.io.PrintWriter;
-import java.io.ObjectOutputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.EOFException;
 import java.io.ObjectInputStream;
-import java.io.Serializable;
+import java.io.ObjectOutputStream;
+import java.io.PrintStream;
 
-import junit.framework.*;
+import junit.framework.Test;
+import junit.framework.TestSuite;
 import junit.textui.TestRunner;
+
 /**
  * Tests the org.apache.commons.lang.exception.NestableException class.
  *
  * @author <a href="mailto:steven@caswell.name">Steven Caswell</a>
- * @version $Id: NestableExceptionTestCase.java,v 1.7 2002/10/09 17:20:44 sullis Exp $
+ * @version $Id$
  */
-public class NestableExceptionTestCase extends AbstractNestableTestCase
-{
+public class NestableExceptionTestCase extends AbstractNestableTestCase {
     
     /**
      * Construct a new instance of
@@ -235,7 +197,7 @@ public class NestableExceptionTestCase extends AbstractNestableTestCase
      */
     public Throwable getThrowable(String msg)
     {
-        return new Exception(msg);
+        return new EOFException(msg);
     }
     
     /**
@@ -243,65 +205,109 @@ public class NestableExceptionTestCase extends AbstractNestableTestCase
      */
     public Class getThrowableClass()
     {
+        return EOFException.class;
+    }
+
+    /**
+     * @see AbstractNestableTestCase#getBaseThrowableClass()
+     */
+    public Class getBaseThrowableClass()
+    {
         return Exception.class;
     }
     
-    public void testSerialization()
-    	throws java.io.IOException, ClassNotFoundException
+    public void testSpecificPrintStackTrace()
     {
-    	RuntimeException nestedEx = new RuntimeException("nested exception message");
-    	NestableExceptionTester1 ex = new NestableExceptionTester1("serialization test", nestedEx);
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        PrintStream ps = new PrintStream(baos);
+        NestableException ne = new NestableException("outer", new NestableException("inner", new Exception("another exception")));
+        for(int i = 0; i < 2; i++)
+        {
+            if(i == 0)
+            {
+                // Test printStackTrac()
+                // Replace System.err with our own PrintStream so that we can
+                // obtain and check the printStrackTrace output
+                PrintStream err = System.err;
+                System.setErr(ps);
+                ne.printStackTrace();
+                // Restore the System.err
+                System.setErr(err);
+            }
+            else
+            {
+                // Test printStackTrace(PrintStream)
+                ne.printStackTrace(ps);
+            }
+        }
+        String msg = baos.toString();
+        assertTrue( "printStackTrace() starts with outer message", msg.startsWith("org.apache.commons.lang.exception.NestableException: outer"));
+        assertTrue( "printStackTrace() contains 1st nested message", msg.indexOf("Caused by: org.apache.commons.lang.exception.NestableException: inner") >= 0);
+        assertTrue( "printStackTrace() contains 2nd nested message", msg.indexOf("Caused by: java.lang.Exception: another exception") >= 0);
+        assertTrue( "printStackTrace() inner message after outer message", 
+            msg.indexOf("org.apache.commons.lang.exception.NestableException: outer") <
+            msg.indexOf("Caused by: org.apache.commons.lang.exception.NestableException: inner"));
+        assertTrue( "printStackTrace() cause message after inner message",
+            msg.indexOf("Caused by: org.apache.commons.lang.exception.NestableException: inner") <
+            msg.indexOf("Caused by: java.lang.Exception: another exception"));
+    }
+    
+    public void testSerialization()
+        throws java.io.IOException, ClassNotFoundException
+    {
+        RuntimeException nestedEx = new RuntimeException("nested exception message");
+        NestableExceptionTester1 ex = new NestableExceptionTester1("serialization test", nestedEx);
 
-		assertTrue( "implements java.io.Serializable", nestedEx instanceof java.io.Serializable);
-		
-		assertTrue( "implements java.io.Serializable", ex instanceof java.io.Serializable);
-		
-		ByteArrayOutputStream baos = new ByteArrayOutputStream();
-		ByteArrayInputStream bais = null;
-		ObjectOutputStream oos = null;
-		ObjectInputStream ois = null;
+        assertTrue( "implements java.io.Serializable", nestedEx instanceof java.io.Serializable);
+        
+        assertTrue( "implements java.io.Serializable", ex instanceof java.io.Serializable);
+        
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ByteArrayInputStream bais = null;
+        ObjectOutputStream oos = null;
+        ObjectInputStream ois = null;
 
-		try
-		{		
-			oos = new ObjectOutputStream(baos);
-			oos.writeObject(ex);
-			oos.flush();
-			bais = new ByteArrayInputStream(baos.toByteArray());
-			ois = new ObjectInputStream(bais);
-			NestableExceptionTester1 deserializedEx = (NestableExceptionTester1) ois.readObject();
-			assertEquals( 
-					"getThrowableCount() return value",
-						ex.getThrowableCount(),
-						deserializedEx.getThrowableCount());
-			
-			for (int i = 0; i < ex.getThrowableCount(); i++)
-			{
-				Throwable t = ex.getThrowable(i);
-				Throwable deserializedThrowable = deserializedEx.getThrowable(i);
-				
-				assertEquals( t.getClass(),
-						deserializedThrowable.getClass());
-						
-				assertEquals(
-					t.getMessage(),
-					deserializedThrowable.getMessage());
-			}
-		}
-		finally
-		{
-			if (null != oos)
-			{
-				try
-				{
-					oos.close();
-				}
-				catch (Exception ignored)
-				{
-					// intentionally empty
-				}
-			}
-		}
-		
+        try
+        {        
+            oos = new ObjectOutputStream(baos);
+            oos.writeObject(ex);
+            oos.flush();
+            bais = new ByteArrayInputStream(baos.toByteArray());
+            ois = new ObjectInputStream(bais);
+            NestableExceptionTester1 deserializedEx = (NestableExceptionTester1) ois.readObject();
+            assertEquals( 
+                    "getThrowableCount() return value",
+                        ex.getThrowableCount(),
+                        deserializedEx.getThrowableCount());
+            
+            for (int i = 0; i < ex.getThrowableCount(); i++)
+            {
+                Throwable t = ex.getThrowable(i);
+                Throwable deserializedThrowable = deserializedEx.getThrowable(i);
+                
+                assertEquals( t.getClass(),
+                        deserializedThrowable.getClass());
+                        
+                assertEquals(
+                    t.getMessage(),
+                    deserializedThrowable.getMessage());
+            }
+        }
+        finally
+        {
+            if (null != oos)
+            {
+                try
+                {
+                    oos.close();
+                }
+                catch (Exception ignored)
+                {
+                    // intentionally empty
+                }
+            }
+        }
+        
     }
 }
 
